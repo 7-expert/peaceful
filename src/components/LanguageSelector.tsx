@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown } from 'lucide-react';
 
 const languages = [
@@ -159,18 +160,106 @@ export default function LanguageSelector() {
     };
   }, []);
 
-  const handleSelect = (code: string) => {
-    setLang(code);
-    setTranslateCookie(code);
-    document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
-    setIsOpen(false);
-    window.location.reload();
-  };
 
   const active = languages.find(l => l.code === lang) ?? languages[0];
 
+  // Translation screen loading state (shows a solid white overlay blocking view until translated)
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translatingMsg, setTranslatingMsg] = useState('Hang tight, translating...');
+
+  // Block screen if a translate reload has just been triggered in session/local storage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const activeLoading = localStorage.getItem('translation_loading');
+      if (activeLoading) {
+        setIsTranslating(true);
+        const code = readLangCookie();
+        let msg = 'Hang tight, translating...';
+        if (code === 'es') msg = 'Un momento, traduciendo...';
+        else if (code === 'fr') msg = 'Un instant, traduction en cours...';
+        else if (code === 'pt') msg = 'Um momento, traduzindo...';
+        else if (code === 'ar') msg = 'لحظة واحدة، جاري الترجمة...';
+        setTranslatingMsg(msg);
+
+        // Turn off loader once Google Translate has completed translation check
+        const t = setTimeout(() => {
+          localStorage.removeItem('translation_loading');
+          setIsTranslating(false);
+        }, 2500);
+        return () => clearTimeout(t);
+      }
+    }
+  }, []);
+
+  const handleSelect = (code: string) => {
+    if (code === lang) {
+      setIsOpen(false);
+      return;
+    }
+    
+    // Set message based on selected language
+    let msg = 'Hang tight, translating...';
+    if (code === 'es') msg = 'Un momento, traduciendo...';
+    else if (code === 'fr') msg = 'Un instant, traduction en cours...';
+    else if (code === 'pt') msg = 'Um momento, traduzindo...';
+    else if (code === 'ar') msg = 'لحظة واحدة، جاري الترجمة...';
+    
+    setTranslatingMsg(msg);
+    setIsTranslating(true);
+    setIsOpen(false);
+    
+    // Persist loader state across page refresh
+    localStorage.setItem('translation_loading', 'true');
+
+    setTimeout(() => {
+      setLang(code);
+      setTranslateCookie(code);
+      document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
+      window.location.reload();
+    }, 600);
+  };
+
   return (
     <div ref={dropdownRef} className="relative inline-block text-left shrink-0">
+      {/* Solid White Loading Overlay — covers everything including navbar using React Portal */}
+      {isTranslating && typeof document !== 'undefined' && createPortal(
+        <div
+          className="notranslate select-none"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999999,
+            background: '#ffffff',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '28px', maxWidth: '360px', padding: '0 24px', textAlign: 'center' }}>
+            {/* Logo */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo4.png" alt="Logo" style={{ height: '64px', width: 'auto', objectFit: 'contain' }} />
+            {/* Spinner */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{
+                width: '64px', height: '64px',
+                borderRadius: '50%',
+                border: '4px solid #e0f2fe',
+                borderTopColor: '#0ea5e9',
+                animation: 'spin 0.9s linear infinite',
+              }} />
+              <span style={{ position: 'absolute', fontSize: '22px' }}>🦷</span>
+            </div>
+            <div>
+              <p style={{ fontSize: '20px', fontWeight: 800, color: '#1e293b', margin: '0 0 8px', lineHeight: 1.3 }}>{translatingMsg}</p>
+              <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0 }}>Translating your page, please wait…</p>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
       <div id="google_translate_element" aria-hidden="true" style={{ display: 'none' }} />
 
       <button

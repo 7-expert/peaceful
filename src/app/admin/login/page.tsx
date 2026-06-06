@@ -48,23 +48,20 @@ export default function AdminLogin() {
 
         <div className="bg-white rounded-3xl border border-border-slate shadow-lg p-8">
 
-          {/* Logo */}
-          <div className="flex items-center gap-2.5 mb-8">
-            <div className="h-9 w-9 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-center p-1">
-              <Image src="/logo.png" alt="Peaceful Dental Solutions Logo" width={28} height={28} className="object-contain" />
-            </div>
-            <div>
-              <div className="text-sm font-bold text-primary-ocean font-display leading-tight">
-                Peaceful Dental
-              </div>
-              <div className="text-[9px] font-semibold tracking-widest text-accent-blue uppercase">
-                Solutions
-              </div>
-            </div>
+          {/* Logo and Title */}
+          <div className="flex flex-col items-center justify-center mb-8 text-center">
+            <Image
+              src="/logo4.png"
+              alt="Peaceful Dental Solutions Logo"
+              width={100}
+              height={100}
+              style={{ width: 'auto', height: '100px' }}
+              className="object-contain drop-shadow-sm mb-4"
+              priority
+            />
+            <h1 className="text-xl font-bold text-primary-ocean font-display mb-1">Staff Portal</h1>
+            <p className="text-xs text-slate-400">Manage instrument inventory, listings, and quote logs.</p>
           </div>
-
-          <h1 className="text-lg font-bold text-primary-ocean font-display mb-1">Staff Portal</h1>
-          <p className="text-xs text-slate-400 mb-6">Manage instrument inventory, listings, and quote logs.</p>
 
           {error && (
             <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-xs text-red-600 font-medium">

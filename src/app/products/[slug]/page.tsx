@@ -97,7 +97,7 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
   if (loading) return (
     <div className="flex flex-col min-h-screen bg-background">
       <Navbar />
-      <main className="flex-grow flex items-center justify-center text-sm text-slate-400">
+      <main className="flex-grow pt-[120px] flex items-center justify-center text-sm text-slate-400">
         <Loader2 className="h-5 w-5 animate-spin mr-2 text-accent-blue" /> Loading instrument specs…
       </main>
       <Footer />
@@ -107,7 +107,7 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
   if (!product) return (
     <div className="flex flex-col min-h-screen bg-background">
       <Navbar />
-      <main className="flex-grow flex flex-col items-center justify-center gap-4">
+      <main className="flex-grow pt-[120px] flex flex-col items-center justify-center gap-4">
         <p className="text-sm text-slate-400">Instrument Registry record not found.</p>
         <Link href="/products" className="text-sm font-semibold text-accent-blue hover:underline">← Return to Catalog</Link>
       </main>
@@ -118,7 +118,7 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Navbar />
-      <main className="flex-grow py-12 bg-slate-50/50">
+      <main className="flex-grow pt-[120px] pb-12 bg-slate-50/50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
           {/* Breadcrumbs */}

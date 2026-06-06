@@ -8,7 +8,7 @@ export default function Certifications() {
     <div className="flex flex-col min-h-screen bg-background">
       <Navbar />
 
-      <main className="flex-grow py-12 bg-slate-50/50">
+      <main className="flex-grow pt-[120px] pb-12 bg-slate-50/50">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
 
           {/* Breadcrumb */}

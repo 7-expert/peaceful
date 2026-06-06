@@ -1,18 +1,13 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { slugify } from '../lib/utils';
 import { useMarket } from '../context/MarketContext';
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import {
-  ShieldCheck, Award, ChevronRight, ArrowRight, Package, Check,
-  Star, Globe, Truck, Wrench, FlaskConical, Microscope, Quote,
-  Phone, MessageSquare
-} from 'lucide-react';
+import { Check, ShieldCheck, ArrowRight, MessageSquare, Phone } from 'lucide-react';
 
 const MOCK_PRODUCTS = [
   { id: '1', slug: 'cryer-extracting-forceps-150', sku: 'PD-FORCEPS-150', name: 'Cryer Extracting Forceps (150)', category: 'Extracting Forceps', description: 'Universal upper incisor and premolar extraction forceps with anti-slip textured handle.', price_pkr: 4500, price_usd: 48, image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e905d?auto=format&fit=crop&q=80&w=400' },
@@ -21,42 +16,11 @@ const MOCK_PRODUCTS = [
   { id: '4', slug: 'hygienist-scaler-h6h7', sku: 'PD-SCALER-H6', name: 'Hygienist Scaler H6/H7', category: 'Periodontal', description: 'Double-ended sickle scaler with hollow lightweight handle for plaque removal.', price_pkr: 2200, price_usd: 24, image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=400' },
 ];
 
-const CATEGORIES = [
-  { name: 'Extracting Forceps', desc: '120+ upper, lower & pediatric extraction tools', icon: <Wrench className="h-5 w-5 text-accent-blue" /> },
-  { name: 'Dental Pliers', desc: '90+ orthodontic and utility pliers', icon: <Package className="h-5 w-5 text-accent-blue" /> },
-  { name: 'Surgery Kits', desc: '30+ complete suture & periodontal sets', icon: <FlaskConical className="h-5 w-5 text-accent-blue" /> },
-  { name: 'Periodontal & Scaling', desc: '75+ scalers, curettes & explorers', icon: <Microscope className="h-5 w-5 text-accent-blue" /> },
-];
-
-const TESTIMONIALS = [
-  { name: 'Dr. Sarah Mitchell', role: 'Chief Dental Officer, London Dental Group', country: '🇬🇧', body: 'The forceps we received are genuinely on par with Hu-Friedy quality — at a fraction of the import cost. Lead time from Sialkot to UK was under 6 days.' },
-  { name: 'Dr. Khalid Al-Rashid', role: 'Director, Gulf Medical Supplies Co.', country: '🇦🇪', body: 'We have been ordering in bulk for our hospital chain for 3 years. Exceptional consistency across every single batch. CE documentation arrives promptly.' },
-  { name: 'Dr. Priya Nair', role: 'Prosthodontist, Apollo Dental, Mumbai', country: '🇮🇳', body: 'Outstanding autoclave resistance. We run 5 sterilization cycles per day — after 2 years, our instruments still have zero rust or misalignment. Remarkable.' },
-  { name: 'Dr. Ahmed Hassan', role: 'Oral Surgeon, Cairo University Hospital', country: '🇪🇬', body: 'The OEM laser engraving service was perfect for our institutional procurement needs. The quality is indistinguishable from European-branded instruments.' },
-];
-
-const FAQS = [
-  { q: 'What is the minimum order quantity for wholesale pricing?', a: 'For international export, our standard MOQ is 50 units per SKU. For Pakistan domestic orders, there is no minimum — you can order even a single piece.' },
-  { q: 'Do you provide custom OEM branding on instruments?', a: 'Yes. We offer laser engraving of your clinic name, logo, or institution code directly onto instrument handles. There is a one-time setup fee for the engraving template.' },
-  { q: 'How long does international delivery take?', a: 'Standard DHL Express delivery to Europe, North America, and Gulf states takes 4–7 business days from our Sialkot facility. Air freight consolidation is also available for larger orders.' },
-  { q: 'Are your instruments autoclavable?', a: 'All instruments are rated for autoclaving at up to 134°C / 273°F. Every batch is subjected to a copper sulfate passivation challenge test before dispatch.' },
-  { q: 'Can I request a sample before placing a bulk order?', a: 'Yes. We offer a sample kit program — request up to 5 instrument SKUs at trade price with free DHL shipping for first-time international buyers.' },
-];
-
-const MARQUEE_COUNTRIES = [
-  '🇬🇧 United Kingdom', '🇺🇸 United States', '🇦🇪 UAE', '🇸🇦 Saudi Arabia',
-  '🇩🇪 Germany', '🇫🇷 France', '🇦🇺 Australia', '🇨🇦 Canada',
-  '🇮🇳 India', '🇪🇬 Egypt', '🇯🇴 Jordan', '🇳🇱 Netherlands',
-  '🇮🇹 Italy', '🇿🇦 South Africa', '🇲🇾 Malaysia', '🇸🇬 Singapore',
-];
-
 export default function Home() {
   const { market } = useMarket();
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [inquiryStatus, setInquiryStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', organization: '', message: '' });
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', service: 'General Consultation', organization: '', date: '', time: '13:00', message: '' });
 
   useEffect(() => {
     async function fetchFeatured() {
@@ -68,23 +32,26 @@ export default function Home() {
       }
     }
     fetchFeatured();
-    // Auto-cycle testimonials
-    const timer = setInterval(() => setActiveTestimonial(prev => (prev + 1) % TESTIMONIALS.length), 5000);
-    return () => clearInterval(timer);
   }, []);
 
   const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setInquiryStatus('submitting');
     try {
+      const msg = `Booking requested for: ${formData.service} on ${formData.date} at ${formData.time}. Note: ${formData.message}`;
       const { error } = await supabase.from('inquiries').insert([{
-        name: formData.name.trim(), organization: formData.organization.trim(),
-        email: formData.email.trim(), phone: formData.phone.trim(),
-        message: formData.message.trim(), product_sku: null, quantity: 1, status: 'pending'
+        name: formData.name.trim(),
+        organization: formData.organization.trim() || 'Direct Client',
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        message: msg,
+        product_sku: null,
+        quantity: 1,
+        status: 'pending'
       }]);
       if (error) throw error;
       setInquiryStatus('success');
-      setFormData({ name: '', email: '', phone: '', organization: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', service: 'General Consultation', organization: '', date: '', time: '13:00', message: '' });
     } catch (err: any) {
       alert(err.message || 'Submission failed. Please try again.');
       setInquiryStatus('idle');
@@ -96,229 +63,294 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-grow">
+        
+        {/* ─── 1. DENTAL HERO SECTION ──────────────────────────────── */}
+        <section className="dental-hero" style={{ marginTop: 0 }}>
+          <div className="hero-content">
+            <h1 className="notranslate">
+              We Take Care of<br />
+              Your <span>Instruments</span>
+            </h1>
+            <p>
+              Experience top-grade, precision-manufactured German stainless steel dental instruments designed for healthcare excellence.
+            </p>
+            <Link href="/products" className="hero-btn cursor-pointer">
+              View Catalog →
+            </Link>
+          </div>
 
-        {/* ─── HERO ─────────────────────────────────────────────── */}
-        <section className="hero-gradient border-b border-border-slate overflow-hidden relative">
-          <div className="absolute inset-0 bg-[radial-gradient(#e0f2fe_1px,transparent_1px)] [background-size:20px_20px] opacity-30 pointer-events-none" />
-          {/* floating orbs */}
-          <div className="absolute -top-24 -right-24 h-96 w-96 bg-sky-200 rounded-full opacity-20 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-16 -left-16 h-64 w-64 bg-blue-300 rounded-full opacity-10 blur-3xl pointer-events-none" />
+          <div className="teeth-gallery">
+            <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/banner/banner-three-one.png" alt="Instrument details 1" />
+            <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/banner/banner-three-two.png" alt="Instrument details 2" />
+            <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/banner/banner-three-three.png" alt="Instrument details 3" />
+            <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/banner/banner-three-four.png" alt="Instrument details 4" />
+            <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/banner/banner-three-five.png" alt="Instrument details 5" />
+          </div>
+        </section>
 
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">
-            <div className="grid lg:grid-cols-12 gap-12 items-center">
+        {/* ─── 2. EXPERT SECTION ───────────────────────────────────── */}
+        <section className="expert-section border-t border-slate-100">
+          <img
+            src="https://i.pinimg.com/1200x/03/f2/fa/03f2faf1c1aec554604ceaeb08435d72.jpg"
+            alt="Dental background decoration left"
+            className="shape-left-img"
+          />
+          <img
+            src="https://i.pinimg.com/736x/e3/86/22/e386223c0759a15e2ffcc258fc91ef8b.jpg"
+            alt="Dental background decoration right"
+            className="teeth-bg"
+          />
 
-              <div className="space-y-7 lg:col-span-7">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-sky-100 bg-sky-50/60 text-xs font-semibold text-accent-blue">
-                  <span className="h-2 w-2 rounded-full bg-accent-blue inline-block animate-pulse" />
-                  Certified Global Exporter · Sialkot, Pakistan · Since 1998
+          <div className="container">
+            {/* LEFT IMAGE */}
+            <div className="image-box border border-slate-200 shadow-md">
+              <img
+                src="https://images.unsplash.com/photo-1609840114035-3c981b782dfe?q=80&w=1200&auto=format&fit=crop"
+                alt="Instrument Production Quality"
+              />
+            </div>
+
+            {/* RIGHT CONTENT */}
+            <div className="content">
+              <h2 className="font-display">
+                Expert Forging for Every Tool,
+                <span>Restore Surgical Confidence</span>
+              </h2>
+
+              <p>
+                From diagnostics to complex surgical procedures, our expert engineering team is dedicated to producing high-grade instruments that last a lifetime.
+              </p>
+
+              <div className="service-grid">
+                {/* Card 1 */}
+                <div className="card">
+                  <div className="icon">
+                    <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/icons/about-icon-one.svg" alt="Quality" />
+                  </div>
+                  <h4>Best Stainless Steel</h4>
+                  <p>Certified German and French steel alloys for strength.</p>
                 </div>
 
+                {/* Card 2 */}
+                <div className="card">
+                  <div className="icon">
+                    <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/icons/about-icon-two.svg" alt="Team" />
+                  </div>
+                  <h4>Expert Forging Team</h4>
+                  <p>Specialized craftsmen in Sialkot manufacturing center.</p>
+                </div>
+
+                {/* Card 3 */}
+                <div className="card">
+                  <div className="icon">
+                    <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/icons/about-icon-three.svg" alt="Support" />
+                  </div>
+                  <h4>24/7 Trade Support</h4>
+                  <p>Fast responses, order updates, and cargo handling.</p>
+                </div>
+
+                {/* Card 4 */}
+                <div className="card">
+                  <div className="icon">
+                    <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/icons/about-icon-four.svg" alt="Consultation" />
+                  </div>
+                  <h4>OEM Customization</h4>
+                  <p>Custom laser engraving and shape modifications.</p>
+                </div>
+              </div>
+
+              <Link href="/about" className="btn cursor-pointer">
+                More About Us
+                <span>&rarr;</span>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── 3. DENTAL MARQUEE ───────────────────────────────────── */}
+        <section className="marquee border-y border-slate-100">
+          <div className="marquee-track">
+            <div className="item">FORCEPS</div>
+            <div className="star">✦</div>
+            <div className="item">PLIERS</div>
+            <div className="star">✦</div>
+            <div className="item">SCALERS</div>
+            <div className="star">✦</div>
+            <div className="item">SUTURE KITS</div>
+            <div className="star">✦</div>
+            <div className="item">IMPLANTS</div>
+            <div className="star">✦</div>
+            <div className="item">DIAGNOSTICS</div>
+            <div className="star">✦</div>
+
+            {/* duplicates for loop */}
+            <div className="item">FORCEPS</div>
+            <div className="star">✦</div>
+            <div className="item">PLIERS</div>
+            <div className="star">✦</div>
+            <div className="item">SCALERS</div>
+            <div className="star">✦</div>
+            <div className="item">SUTURE KITS</div>
+            <div className="star">✦</div>
+            <div className="item">IMPLANTS</div>
+            <div className="star">✦</div>
+            <div className="item">DIAGNOSTICS</div>
+            <div className="star">✦</div>
+          </div>
+        </section>
+
+        {/* ─── 4. ABOUT SECTION ────────────────────────────────────── */}
+        <section className="about-section">
+          <div className="about-wrapper">
+            {/* LEFT */}
+            <div className="left-content">
+              <div className="tag">Who We Are</div>
+              <div className="star-shape">✷</div>
+              <div className="big-number">28</div>
+              {/* Mobile-only horizontal years label (vertical-text is hidden on mobile) */}
+              <span className="years-label-mobile hidden">Years Of Manufacturing Excellence</span>
+              <div className="vertical-text">Years Of Manufacturing Excellence</div>
+
+              <div className="review-box">
+                <div className="review-images">
+                  <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Client 1" />
+                  <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Client 2" />
+                  <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Client 3" />
+                  <img src="https://randomuser.me/api/portraits/men/15.jpg" alt="Client 4" />
+                </div>
+                <div className="review-text">
+                  Trusted by 1,250+ dental clinics globally
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT */}
+            <div className="info-cards">
+              <div className="info-card">
+                <div className="icon-box green">
+                  <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/icons/target-icon-1.svg" alt="Mission" />
+                </div>
                 <div>
-                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-primary-ocean tracking-tight leading-[1.1] font-display">
-                    Precision<br />
-                    <span className="text-accent-blue">Dental</span><br />
-                    Instruments
-                  </h1>
-                  <p className="mt-6 text-sm sm:text-base text-muted-slate leading-relaxed max-w-lg">
-                    Surgically-certified apparatus forged from AISI 410 German stainless steel. Backed by FDA, CE, ISO 13485 & a 5-year unconditional replacement guarantee.
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <Link href="/products" className="flex items-center gap-2 h-12 px-7 rounded-xl bg-primary-ocean text-white text-sm font-bold hover:bg-primary-ocean-hover transition-all shadow-lg hover:shadow-xl cursor-pointer">
-                    Browse Catalog <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  <Link href="/contact" className="flex items-center gap-2 h-12 px-7 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:border-accent-blue hover:text-accent-blue transition-all cursor-pointer shadow-sm">
-                    Get Bulk Quote
-                  </Link>
-                </div>
-
-                {/* Cert badges */}
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {['FDA Registered', 'CE Mark', 'ISO 13485', 'ISO 9001'].map(b => (
-                    <span key={b} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border border-sky-200 bg-sky-50 text-accent-blue">
-                      <ShieldCheck className="h-3 w-3" /> {b}
-                    </span>
-                  ))}
+                  <h3 className="font-display">Our Mission</h3>
+                  <p>To produce and export highest-quality surgical apparatus with certified chemical composition and strict tolerance audits.</p>
                 </div>
               </div>
 
-              <div className="flex justify-center lg:justify-end lg:col-span-5">
-                <div className="relative">
-                  <div className="w-80 h-80 rounded-3xl bg-white border border-border-slate shadow-2xl flex items-center justify-center p-12 hover:scale-[1.02] transition-transform duration-500">
-                    <Image src="/logo.png" alt="Peaceful Dental Solutions" width={220} height={220} className="object-contain" priority />
-                  </div>
-                  {/* Floating cards */}
-                  <div className="absolute -bottom-5 -left-5 bg-white border border-border-slate shadow-xl rounded-2xl px-4 py-3 flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-                      <Check className="h-4 w-4 text-emerald-600" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-extrabold text-primary-ocean">5-Year Guarantee</div>
-                      <div className="text-[10px] text-slate-400">Full Replacement</div>
-                    </div>
-                  </div>
-                  <div className="absolute -top-5 -right-5 bg-white border border-border-slate shadow-xl rounded-2xl px-4 py-3 flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-sky-50 flex items-center justify-center">
-                      <Globe className="h-4 w-4 text-accent-blue" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-extrabold text-primary-ocean">45+ Countries</div>
-                      <div className="text-[10px] text-slate-400">Worldwide Export</div>
-                    </div>
-                  </div>
+              <div className="info-card">
+                <div className="icon-box blue">
+                  <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/icons/target-icon-2.svg" alt="Vision" />
+                </div>
+                <div>
+                  <h3 className="font-display">Our Vision</h3>
+                  <p>To remain the premier manufacturer of dental instruments in Sialkot, exporting high-precision tools worldwide.</p>
+                </div>
+              </div>
+
+              <div className="info-card">
+                <div className="icon-box pink">
+                  <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/icons/target-icon-3.svg" alt="Care" />
+                </div>
+                <div>
+                  <h3 className="font-display">Why We Care</h3>
+                  <p>Clinical precision starts with tools that don't rust, slip, or fail under pressure. We supply instruments doctors trust completely.</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ─── STATS COUNTER BAR ─────────────────────────────────── */}
-        <section className="py-14 bg-primary-ocean relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(56,189,248,0.15)_0%,_transparent_70%)] pointer-events-none" />
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
-              {[
-                { stat: '2.4M+', label: 'Instruments Produced', sub: 'Since 1998' },
-                { stat: '1,250+', label: 'Clinics Worldwide', sub: 'Active Accounts' },
-                { stat: '99.98%', label: 'Sterility Pass Rate', sub: 'Per Batch Audit' },
-                { stat: '45+', label: 'Countries Served', sub: 'DHL / FedEx Export' },
-              ].map(({ stat, label, sub }) => (
-                <div key={label} className="space-y-1">
-                  <div className="text-4xl font-extrabold text-sky-200 font-display tracking-tight">{stat}</div>
-                  <div className="text-xs font-bold text-white uppercase tracking-widest">{label}</div>
-                  <div className="text-[10px] text-slate-400">{sub}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* ─── 5. WHY CHOOSE US SECTION ────────────────────────────── */}
+        <section className="choose-section">
+          <img className="corner-left" src="https://doccure.dreamstechnologies.com/html/template/assets/img/category/choose-bg-02.png" alt="Decoration left" />
+          <img className="corner-right" src="https://doccure.dreamstechnologies.com/html/template/assets/img/category/choose-bg-01.png" alt="Decoration right" />
 
-        {/* ─── SCROLLING COUNTRY MARQUEE ─────────────────────────── */}
-        <div className="py-4 bg-slate-50 border-y border-border-slate overflow-hidden">
-          <div className="flex gap-10 animate-marquee whitespace-nowrap">
-            {[...MARQUEE_COUNTRIES, ...MARQUEE_COUNTRIES].map((c, i) => (
-              <span key={i} className="text-xs font-bold text-slate-500 shrink-0">{c}</span>
-            ))}
-          </div>
-        </div>
+          <div className="tag">Why Choose Us</div>
+          <h2>Why Choose Our Instruments?</h2>
+          <p>Experience the manufacturing difference that quality alloys, modern passivation, and precise tempering make.</p>
 
-        {/* ─── VALUE PILLARS ─────────────────────────────────────── */}
-        <section className="py-20 bg-white">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                { icon: <ShieldCheck className="h-6 w-6 text-accent-blue" />, title: 'Austenite German Steel', desc: 'AISI 410 & 420 alloys rated for 5,000+ sterilization cycles without structural degradation.' },
-                { icon: <Award className="h-6 w-6 text-accent-blue" />, title: 'Universal Certifications', desc: 'FDA Facility #301140928, CE Mark, ISO 13485:2016, and ISO 9001:2015 — all active and auditable.' },
-                { icon: <Truck className="h-6 w-6 text-accent-blue" />, title: 'Global Logistics Network', desc: 'DHL Express & FedEx air freight. Customs-ready COO, blister packing, and sterilized packaging.' },
-              ].map(({ icon, title, desc }) => (
-                <div key={title} className="group p-8 rounded-2xl border border-border-slate bg-slate-50/50 space-y-4 hover:border-accent-blue hover:bg-white hover:shadow-md transition-all duration-300 cursor-default">
-                  <div className="h-12 w-12 rounded-xl bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center transition-colors">{icon}</div>
-                  <h3 className="text-base font-bold text-primary-ocean font-display">{title}</h3>
-                  <p className="text-sm text-muted-slate leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+          <div className="choose-grid">
+            {/* LEFT */}
+            <div>
+              <div className="feature">
+                <h3>Direct Factory Pricing</h3>
+                <div className="line"></div>
+                <p>We eliminate agent markups. Purchase directly from the Sialkot manufacturing floor.</p>
+              </div>
 
-        {/* ─── PRODUCT CATEGORIES ────────────────────────────────── */}
-        <section className="py-20 bg-slate-50 border-t border-border-slate">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-12">
-              <span className="text-xs font-bold uppercase tracking-widest text-accent-blue">Instrument Registry</span>
-              <h2 className="text-3xl font-extrabold text-primary-ocean font-display mt-2">Browse Instrument Families</h2>
-              <p className="mt-3 text-sm text-muted-slate max-w-md">Professional catalog covering diagnostics, extractions, orthodontics, and minor surgeries.</p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {CATEGORIES.map((cat) => (
-                <Link key={cat.name} href={`/products?category=${encodeURIComponent(cat.name)}`}
-                  className="group block p-6 rounded-2xl bg-white border border-border-slate hover:border-accent-blue hover:shadow-lg transition-all duration-300">
-                  <div className="h-10 w-10 rounded-xl bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center mb-4 transition-colors">
-                    {cat.icon}
-                  </div>
-                  <h3 className="text-sm font-bold text-primary-ocean group-hover:text-accent-blue transition-colors font-display">{cat.name}</h3>
-                  <p className="mt-1.5 text-xs text-muted-slate leading-relaxed">{cat.desc}</p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-xs text-accent-blue font-bold group-hover:translate-x-1 transition-transform">
-                    View Range <ArrowRight className="h-3.5 w-3.5" />
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
+              <div className="feature">
+                <h3>Hygiene & Sterilization</h3>
+                <div className="line"></div>
+                <p>Boil-tested and passivation-challenged. Rates for 5,000+ autoclave cycles.</p>
+              </div>
 
-        {/* ─── MARKET-AWARE SHIPPING BAND ────────────────────────── */}
-        <section className="py-16 bg-white border-t border-border-slate">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="rounded-3xl border border-border-slate bg-gradient-to-br from-slate-50 to-sky-50/30 p-8 md:p-12 relative overflow-hidden">
-              <div className="absolute right-0 top-0 h-64 w-64 bg-sky-100 rounded-full blur-3xl opacity-20 pointer-events-none" />
-              <div className="max-w-3xl space-y-5 relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-accent-blue">
-                  {market === 'pk' ? '🇵🇰  Pakistan Domestic Supply' : '🌐  Global Export Operations'}
-                </div>
-                {market === 'pk' ? (
-                  <>
-                    <h3 className="text-2xl font-extrabold text-primary-ocean font-display">Direct Manufacturing → Your Clinic</h3>
-                    <p className="text-sm text-muted-slate leading-relaxed">Supply directly from our Sialkot production floor. Wholesale pricing, free domestic shipping on orders over PKR 10,000, with a dedicated Lahore sales office.</p>
-                    <div className="grid sm:grid-cols-3 gap-3 text-xs font-bold text-slate-700">
-                      {['Cash on Delivery (COD)', '2-3 Days Nationwide', 'Lahore Walk-in Office'].map(f => (
-                        <div key={f} className="flex items-center gap-2"><Check className="h-4 w-4 text-accent-blue shrink-0" /> {f}</div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <h3 className="text-2xl font-extrabold text-primary-ocean font-display">Factory-to-Clinic Global Shipments</h3>
-                    <p className="text-sm text-muted-slate leading-relaxed">Supplying dental clinics, universities, and distribution networks across 45+ countries. DHL Express and FedEx couriers, with COO, sterilized blister packing, and OEM laser engraving.</p>
-                    <div className="grid sm:grid-cols-3 gap-3 text-xs font-bold text-slate-700">
-                      {['DHL & FedEx Air Freight', 'Bank LC / TT / PayPal', 'Custom OEM Branding'].map(f => (
-                        <div key={f} className="flex items-center gap-2"><Check className="h-4 w-4 text-accent-blue shrink-0" /> {f}</div>
-                      ))}
-                    </div>
-                  </>
-                )}
-                <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-primary-ocean text-white text-xs font-bold hover:bg-primary-ocean-hover transition-all shadow-md cursor-pointer">
-                  Request Trade Terms <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
+              <div className="feature">
+                <h3>Guaranteed Replacement</h3>
+                <div className="line"></div>
+                <p>Every single instrument comes with our signature 5-year replacement guarantee.</p>
+              </div>
+            </div>
+
+            {/* CENTER */}
+            <div className="center-image">
+              <img src="/image1.png" alt="Dental instrument detail" className="max-w-xs" />
+            </div>
+
+            {/* RIGHT */}
+            <div>
+              <div className="feature">
+                <h3>Painless Operations</h3>
+                <div className="line"></div>
+                <p>Precision-ground tips and meeting joints prevent patient discomfort or tissue tearing.</p>
+              </div>
+
+              <div className="feature">
+                <h3>Certified Sourcing</h3>
+                <div className="line"></div>
+                <p>FDA registered facility, CE Declaration of Conformity, ISO 13485 & 9001 certified.</p>
+              </div>
+
+              <div className="feature">
+                <h3>Global Delivery</h3>
+                <div className="line"></div>
+                <p>Consolidated air cargo, DHL Express, and FedEx options to 45+ international destinations.</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ─── FEATURED PRODUCTS ─────────────────────────────────── */}
-        <section className="py-20 bg-slate-50 border-t border-border-slate">
+        {/* ─── 6. DYNAMIC FEATURED PRODUCTS REGISTRY ───────────────── */}
+        <section className="py-20 bg-slate-50 border-t border-slate-100">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row justify-between sm:items-end mb-10 gap-4">
               <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-accent-blue">Bestsellers</span>
-                <h2 className="text-3xl font-extrabold text-primary-ocean font-display mt-2">Featured Instruments</h2>
-                <p className="mt-2 text-sm text-muted-slate">Hand-inspected, high-demand surgical tools from our catalog.</p>
+                <span className="text-xs font-bold uppercase tracking-widest text-blue-600">Instrument Registry</span>
+                <h2 className="text-3xl font-extrabold text-slate-900 font-display mt-2">Featured Products</h2>
+                <p className="mt-2 text-sm text-slate-500">Hand-inspected, surgical grade instrument models in high demand.</p>
               </div>
-              <Link href="/products" className="text-sm font-bold text-accent-blue hover:text-accent-blue-hover flex items-center gap-1">
-                Full Catalog <ChevronRight className="h-4 w-4" />
+              <Link href="/products" className="text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                Full Catalog &rarr;
               </Link>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredProducts.map((product) => (
-                <Link key={product.id} href={`/products/${product.slug || slugify(product.name)}`} className="premium-card flex flex-col overflow-hidden group">
+                <Link key={product.id} href={`/products/${product.slug || slugify(product.name)}`} className="premium-card flex flex-col overflow-hidden group bg-white">
                   <div className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative overflow-hidden">
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.name} className="object-contain max-h-full max-w-full group-hover:scale-105 transition-transform duration-500" />
                     ) : (
                       <div className="text-xs text-slate-400">No Image</div>
                     )}
-                    <span className="absolute top-3 left-3 bg-white border border-border-slate px-2.5 py-0.5 rounded-md text-[9px] font-mono text-slate-500 notranslate">{product.sku}</span>
+                    <span className="absolute top-3 left-3 bg-white border border-slate-200 px-2 py-0.5 rounded-md text-[9px] font-mono text-slate-500 notranslate">{product.sku}</span>
                   </div>
-                  <div className="p-5 flex flex-col flex-grow bg-white">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent-blue">{product.category}</span>
-                    <h3 className="mt-1 text-sm font-bold text-primary-ocean line-clamp-1 font-display notranslate">{product.name}</h3>
-                    <p className="mt-1 text-xs text-muted-slate line-clamp-2 flex-grow leading-relaxed">{product.description}</p>
+                  <div className="p-5 flex flex-col flex-grow bg-white border-t border-slate-100">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">{product.category}</span>
+                    <h3 className="mt-1 text-sm font-bold text-slate-900 line-clamp-1 font-display notranslate">{product.name}</h3>
+                    <p className="mt-1 text-xs text-slate-500 line-clamp-2 flex-grow leading-relaxed">{product.description}</p>
                     <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
-                      <span className="text-base font-extrabold text-primary-ocean">
+                      <span className="text-base font-extrabold text-blue-600">
                         {market === 'pk' ? `Rs. ${product.price_pkr.toLocaleString()}` : `$${product.price_usd}`}
                       </span>
-                      <span className="text-xs font-bold text-accent-blue group-hover:underline">Get Quote →</span>
+                      <span className="text-xs font-bold text-blue-600 group-hover:underline">Get Quote &rarr;</span>
                     </div>
                   </div>
                 </Link>
@@ -327,234 +359,209 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ─── CERTIFICATIONS & TECH SPECS ────────────────────────── */}
-        <section className="py-20 bg-white border-t border-border-slate">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-14 items-center">
-              <div className="space-y-6">
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-widest text-accent-blue">Regulatory Compliance</span>
-                  <h2 className="text-3xl font-extrabold text-primary-ocean font-display mt-2">Certified to Every Major Standard</h2>
-                  <p className="mt-3 text-sm text-muted-slate leading-relaxed">Every batch undergoes chemical passivation, boil tests, and individual microscope inspection before clearance to ship.</p>
-                </div>
-                <div className="grid gap-3">
-                  {[
-                    'FDA Facility Registration #301140928',
-                    'CE Declaration of Conformity (EU Medical Devices)',
-                    'ISO 13485:2016 — Medical Quality Management',
-                    'ISO 9001:2015 — Global Manufacturing Standards',
-                  ].map((cert) => (
-                    <div key={cert} className="flex items-center gap-3 text-sm text-slate-700">
-                      <div className="h-5 w-5 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0">
-                        <Check className="h-3 w-3 text-accent-blue" />
-                      </div>
-                      <span className="font-medium">{cert}</span>
-                    </div>
-                  ))}
-                </div>
-                <Link href="/certifications" className="inline-flex items-center gap-2 text-sm font-bold text-accent-blue hover:underline">
-                  View Full Certification Portfolio <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { stat: 'HRC 50–54', label: 'Rockwell Hardness', desc: 'Surgical grade, prevents chipping on impact' },
-                  { stat: '0.05 mm', label: 'Tolerance', desc: 'Precision-ground tips and meeting joints' },
-                  { stat: '100%', label: 'Passivation Check', desc: 'Copper sulfate immersion test per batch' },
-                  { stat: '134°C', label: 'Autoclave Rating', desc: 'Full steam cycle compatibility confirmed' },
-                ].map(({ stat, label, desc }) => (
-                  <div key={label} className="p-6 rounded-2xl bg-slate-50 border border-border-slate space-y-1.5 hover:border-accent-blue transition-colors duration-300">
-                    <div className="text-2xl font-extrabold text-primary-ocean font-display">{stat}</div>
-                    <div className="text-xs font-bold text-slate-800">{label}</div>
-                    <div className="text-xs text-slate-500 leading-relaxed">{desc}</div>
-                  </div>
-                ))}
-              </div>
+        {/* ─── 7. TESTIMONIALS SECTION ────────────────────────────── */}
+        <section className="dr-section border-t border-slate-100">
+          <div className="dr-head">
+            <div className="dr-pill"><span className="dot"></span> Testimonials</div>
+            <h2>Feedback from Doctors Worldwide</h2>
+            <p>Discover what surgeons and clinics say about our instrument quality and durability.</p>
+          </div>
+
+          {/* ROW 1: left → right — cards repeated 3× for gapless loop */}
+          <div className="dr-outer row1">
+            <div className="dr-track">
+              {/* SET A */}
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Dr. James" /><div><div className="dr-name">Dr. James Harper</div><div className="dr-loc">New York, USA</div><span className="dr-badge">Orthodontist</span></div></div><p className="dr-text">The extracting forceps are on par with German-branded equivalents. Passivation holds up perfectly over countless autoclave cycles.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dr. Sofia" /><div><div className="dr-name">Dr. Sofia Müller</div><div className="dr-loc">Berlin, Germany</div><span className="dr-badge">Periodontist</span></div></div><p className="dr-text">Outstanding durability on periodontal scalers. Ergonomic design reduces strain and tips retain sharpness perfectly.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/55.jpg" alt="Dr. Arjun" /><div><div className="dr-name">Dr. Arjun Mehta</div><div className="dr-loc">Mumbai, India</div><span className="dr-badge">Prosthodontist</span></div></div><p className="dr-text">Very responsive team. Custom laser engraving setup is neat. Shipping from Sialkot to Mumbai takes under 5 days.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/68.jpg" alt="Dr. Yuki" /><div><div className="dr-name">Dr. Yuki Tanaka</div><div className="dr-loc">Tokyo, Japan</div><span className="dr-badge">Endodontist</span></div></div><p className="dr-text">Root canal files hold up beautifully without fracture risks. Exceptional quality control and documentation support.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/73.jpg" alt="Dr. Khalid" /><div><div className="dr-name">Dr. Khalid Mansour</div><div className="dr-loc">Riyadh, KSA</div><span className="dr-badge">Oral Surgeon</span></div></div><p className="dr-text">Bone chisels and elevators are exceptionally well balanced. Reduced hand fatigue significantly during long procedures.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/82.jpg" alt="Dr. Laura" /><div><div className="dr-name">Dr. Laura Bianchi</div><div className="dr-loc">Milan, Italy</div><span className="dr-badge">Oral Surgeon</span></div></div><p className="dr-text">Packaging and sterilization documentation meet EU MDR standards without any extra hassle. Highly recommended supplier.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              {/* SET B — exact duplicate for seamless loop */}
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="" /><div><div className="dr-name">Dr. James Harper</div><div className="dr-loc">New York, USA</div><span className="dr-badge">Orthodontist</span></div></div><p className="dr-text">The extracting forceps are on par with German-branded equivalents. Passivation holds up perfectly over countless autoclave cycles.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="" /><div><div className="dr-name">Dr. Sofia Müller</div><div className="dr-loc">Berlin, Germany</div><span className="dr-badge">Periodontist</span></div></div><p className="dr-text">Outstanding durability on periodontal scalers. Ergonomic design reduces strain and tips retain sharpness perfectly.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/55.jpg" alt="" /><div><div className="dr-name">Dr. Arjun Mehta</div><div className="dr-loc">Mumbai, India</div><span className="dr-badge">Prosthodontist</span></div></div><p className="dr-text">Very responsive team. Custom laser engraving setup is neat. Shipping from Sialkot to Mumbai takes under 5 days.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/68.jpg" alt="" /><div><div className="dr-name">Dr. Yuki Tanaka</div><div className="dr-loc">Tokyo, Japan</div><span className="dr-badge">Endodontist</span></div></div><p className="dr-text">Root canal files hold up beautifully without fracture risks. Exceptional quality control and documentation support.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/73.jpg" alt="" /><div><div className="dr-name">Dr. Khalid Mansour</div><div className="dr-loc">Riyadh, KSA</div><span className="dr-badge">Oral Surgeon</span></div></div><p className="dr-text">Bone chisels and elevators are exceptionally well balanced. Reduced hand fatigue significantly during long procedures.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/82.jpg" alt="" /><div><div className="dr-name">Dr. Laura Bianchi</div><div className="dr-loc">Milan, Italy</div><span className="dr-badge">Oral Surgeon</span></div></div><p className="dr-text">Packaging and sterilization documentation meet EU MDR standards without any extra hassle. Highly recommended supplier.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+            </div>
+          </div>
+
+          {/* ROW 2: right → left */}
+          <div className="dr-outer row2 mt-4">
+            <div className="dr-track">
+              {/* SET A */}
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/41.jpg" alt="Dr. Ahmed" /><div><div className="dr-name">Dr. Ahmed Al-Rashid</div><div className="dr-loc">Dubai, UAE</div><span className="dr-badge">Implantologist</span></div></div><p className="dr-text">Implant kits with high mechanical accuracy. Joint tolerances are precise, reducing micro-movements during surgery.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/56.jpg" alt="Dr. Priya" /><div><div className="dr-name">Dr. Priya Sharma</div><div className="dr-loc">Bangalore, India</div><span className="dr-badge">Cosmetic Dentist</span></div></div><p className="dr-text">The dental pliers have robust hinges and high grip alignment. Essential instruments for orthodontic wire bend procedures.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/62.jpg" alt="Dr. Francois" /><div><div className="dr-name">Dr. François Dupont</div><div className="dr-loc">Paris, France</div><span className="dr-badge">Periodontist</span></div></div><p className="dr-text">Autoclave compliance and material reports were provided cleanly. Excellent regulatory support for international import.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/72.jpg" alt="Dr. Mei" /><div><div className="dr-name">Dr. Mei Lin Chen</div><div className="dr-loc">Shanghai, China</div><span className="dr-badge">Orthodontist</span></div></div><p className="dr-text">Highly corrosion resistant and clean finish. Suture scissors slice smoothly without pulling skin tissue.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/88.jpg" alt="Dr. Carlos" /><div><div className="dr-name">Dr. Carlos Rivera</div><div className="dr-loc">Mexico City, Mexico</div><span className="dr-badge">Endodontist</span></div></div><p className="dr-text">Mirror polished handles look professional and resist tarnish. Our patients notice the quality of our instruments immediately.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/91.jpg" alt="Dr. Aisha" /><div><div className="dr-name">Dr. Aisha Okonkwo</div><div className="dr-loc">Lagos, Nigeria</div><span className="dr-badge">Prosthodontist</span></div></div><p className="dr-text">Fast international shipping, easy reorder, and competitive pricing make this our go-to supplier for the whole clinic chain.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              {/* SET B — exact duplicate for seamless loop */}
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/41.jpg" alt="" /><div><div className="dr-name">Dr. Ahmed Al-Rashid</div><div className="dr-loc">Dubai, UAE</div><span className="dr-badge">Implantologist</span></div></div><p className="dr-text">Implant kits with high mechanical accuracy. Joint tolerances are precise, reducing micro-movements during surgery.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/56.jpg" alt="" /><div><div className="dr-name">Dr. Priya Sharma</div><div className="dr-loc">Bangalore, India</div><span className="dr-badge">Cosmetic Dentist</span></div></div><p className="dr-text">The dental pliers have robust hinges and high grip alignment. Essential instruments for orthodontic wire bend procedures.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/62.jpg" alt="" /><div><div className="dr-name">Dr. François Dupont</div><div className="dr-loc">Paris, France</div><span className="dr-badge">Periodontist</span></div></div><p className="dr-text">Autoclave compliance and material reports were provided cleanly. Excellent regulatory support for international import.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/72.jpg" alt="" /><div><div className="dr-name">Dr. Mei Lin Chen</div><div className="dr-loc">Shanghai, China</div><span className="dr-badge">Orthodontist</span></div></div><p className="dr-text">Highly corrosion resistant and clean finish. Suture scissors slice smoothly without pulling skin tissue.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/men/88.jpg" alt="" /><div><div className="dr-name">Dr. Carlos Rivera</div><div className="dr-loc">Mexico City, Mexico</div><span className="dr-badge">Endodontist</span></div></div><p className="dr-text">Mirror polished handles look professional and resist tarnish. Our patients notice the quality of our instruments immediately.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
+              <div className="dr-card" aria-hidden="true"><div className="dr-top"><img className="dr-avatar" src="https://randomuser.me/api/portraits/women/91.jpg" alt="" /><div><div className="dr-name">Dr. Aisha Okonkwo</div><div className="dr-loc">Lagos, Nigeria</div><span className="dr-badge">Prosthodontist</span></div></div><p className="dr-text">Fast international shipping, easy reorder, and competitive pricing make this our go-to supplier for the whole clinic chain.</p><div className="dr-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div></div>
             </div>
           </div>
         </section>
 
-        {/* ─── MANUFACTURING PROCESS TIMELINE ────────────────────── */}
-        <section className="py-20 bg-slate-50 border-t border-border-slate">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-xl mx-auto mb-14">
-              <span className="text-xs font-bold uppercase tracking-widest text-accent-blue">Manufacturing Cycle</span>
-              <h2 className="text-3xl font-extrabold text-primary-ocean font-display mt-2">How Every Instrument is Built</h2>
-              <p className="mt-3 text-sm text-muted-slate">From raw German steel billets to sterilized instruments in 4 precision stages.</p>
-            </div>
-            <div className="relative">
-              {/* Connecting line on desktop */}
-              <div className="hidden lg:block absolute top-12 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-sky-300 to-transparent" />
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                  { step: '01', icon: <FlaskConical className="h-6 w-6" />, title: 'Alloy Sourcing', desc: 'AISI 410 Austenitic steel billets certified by independent metallurgical labs.' },
-                  { step: '02', icon: <Wrench className="h-6 w-6" />, title: 'Drop Forging', desc: 'Hot-die forge presses shapes the steel at 1,200°C for maximum grain density.' },
-                  { step: '03', icon: <FlaskConical className="h-6 w-6" />, title: 'Passivation Bath', desc: 'Nitric acid bath removes free iron, creating an invisible anti-rust chromium oxide layer.' },
-                  { step: '04', icon: <Microscope className="h-6 w-6" />, title: 'Micro-Inspection', desc: 'Each tip and hinge is verified under 10× magnification for dimensional accuracy.' },
-                ].map(({ step, icon, title, desc }) => (
-                  <div key={step} className="relative bg-white border border-border-slate p-6 rounded-2xl space-y-3 hover:border-accent-blue hover:shadow-lg transition-all duration-300 group">
-                    <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 rounded-xl bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center text-accent-blue transition-colors">
-                        {icon}
-                      </div>
-                      <span className="text-xs font-bold text-slate-300 font-mono">STEP {step}</span>
-                    </div>
-                    <h3 className="text-sm font-bold text-primary-ocean font-display">{title}</h3>
-                    <p className="text-xs text-muted-slate leading-relaxed">{desc}</p>
-                  </div>
-                ))}
-              </div>
+        {/* ─── 8. TILT FEATURE MARQUEE BANNER STRIP ─────────────────── */}
+        <section className="mb-wrap mt-10">
+          <div className="mb-strip">
+            <div className="mb-fade-l"></div>
+            <div className="mb-fade-r"></div>
+            <div className="mb-track">
+              <div className="mb-item"><span className="mb-icon">✚</span><span>FDA Registered Manufacturing</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>AISI 410 German Alloys</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>5-Year Replacement Guarantee</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>CE Declaration of Conformity</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>Global DHL &amp; FedEx Cargo</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>Laser Engraved Custom Branding</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>Boil-Tested Passivated Surfaces</span></div>
+
+              {/* Loop Duplicate */}
+              <div className="mb-item"><span className="mb-icon">✚</span><span>FDA Registered Manufacturing</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>AISI 410 German Alloys</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>5-Year Replacement Guarantee</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>CE Declaration of Conformity</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>Global DHL &amp; FedEx Cargo</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>Laser Engraved Custom Branding</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>Boil-Tested Passivated Surfaces</span></div>
             </div>
           </div>
         </section>
 
-        {/* ─── TESTIMONIALS ──────────────────────────────────────── */}
-        <section className="py-20 bg-primary-ocean border-t border-primary-ocean-hover relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(56,189,248,0.1),transparent_60%)] pointer-events-none" />
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="text-center mb-12">
-              <span className="text-xs font-bold uppercase tracking-widest text-sky-300">What Clinicians Say</span>
-              <h2 className="text-3xl font-extrabold text-white font-display mt-2">Trusted by Dental Professionals Worldwide</h2>
-            </div>
+        {/* ─── 9. HERO INQUIRY BOOKING FORM ─────────────────────────── */}
+        <section className="hero-booking mt-14" id="inquiry">
+          <div className="hero-booking-bg"></div>
 
-            {/* Testimonial Cards */}
-            <div className="relative min-h-[220px]">
-              {TESTIMONIALS.map((t, i) => (
-                <div key={i} className={`absolute inset-0 transition-all duration-700 ${i === activeTestimonial ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 md:p-10 space-y-5">
-                    <Quote className="h-8 w-8 text-sky-300 opacity-60" />
-                    <p className="text-sm text-white/90 leading-relaxed italic">&ldquo;{t.body}&rdquo;</p>
-                    <div className="flex items-center gap-3 pt-2 border-t border-white/10">
-                      <div className="h-10 w-10 rounded-full bg-sky-600 flex items-center justify-center text-white font-bold text-sm">
-                        {t.name[0]}{t.name.split(' ')[1]?.[0]}
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-white">{t.country} {t.name}</div>
-                        <div className="text-[10px] text-sky-300 mt-0.5">{t.role}</div>
-                      </div>
-                      <div className="ml-auto flex gap-0.5">
-                        {[...Array(5)].map((_, s) => <Star key={s} className="h-3 w-3 fill-amber-400 text-amber-400" />)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Dots */}
-            <div className="flex items-center justify-center gap-2 mt-8">
-              {TESTIMONIALS.map((_, i) => (
-                <button key={i} onClick={() => setActiveTestimonial(i)}
-                  className={`rounded-full transition-all cursor-pointer ${i === activeTestimonial ? 'bg-white w-6 h-2' : 'bg-white/30 w-2 h-2 hover:bg-white/50'}`}
-                />
-              ))}
-            </div>
+          {/* Animated 4-Point Stars */}
+          <div className="star star-tl">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 0 C16 0 17 10 16 16 C15 10 16 0 16 0Z" fill="white" />
+              <path d="M32 16 C32 16 22 17 16 16 C22 15 32 16 32 16Z" fill="white" />
+              <path d="M16 32 C16 32 15 22 16 16 C17 22 16 32 16 32Z" fill="white" />
+              <path d="M0 16 C0 16 10 15 16 16 C10 17 0 16 0 16Z" fill="white" />
+              <circle cx="16" cy="16" r="2.5" fill="white" />
+            </svg>
           </div>
-        </section>
-
-        {/* ─── FAQ SECTION ───────────────────────────────────────── */}
-        <section className="py-20 bg-white border-t border-border-slate">
-          <div className="mx-auto max-w-3xl px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <span className="text-xs font-bold uppercase tracking-widest text-accent-blue">Trade & Export</span>
-              <h2 className="text-3xl font-extrabold text-primary-ocean font-display mt-2">Frequently Asked Questions</h2>
-              <p className="mt-3 text-sm text-muted-slate">Everything you need to know before placing a wholesale order.</p>
-            </div>
-            <div className="space-y-3">
-              {FAQS.map((faq, i) => (
-                <div key={i} className="border border-border-slate rounded-2xl overflow-hidden">
-                  <button
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full flex items-center justify-between px-6 py-4 text-left bg-white hover:bg-slate-50 transition-colors cursor-pointer"
-                  >
-                    <span className="text-sm font-bold text-primary-ocean font-display pr-4">{faq.q}</span>
-                    <ChevronRight className={`h-4 w-4 text-slate-400 shrink-0 transition-transform duration-300 ${openFaq === i ? 'rotate-90' : ''}`} />
-                  </button>
-                  {openFaq === i && (
-                    <div className="px-6 pb-5 bg-slate-50 border-t border-slate-100">
-                      <p className="text-sm text-slate-600 leading-relaxed pt-4">{faq.a}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+          <div className="star star-tr">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 0 C16 0 17 10 16 16 C15 10 16 0 16 0Z" fill="white" />
+              <path d="M32 16 C32 16 22 17 16 16 C22 15 32 16 32 16Z" fill="white" />
+              <path d="M16 32 C16 32 15 22 16 16 C17 22 16 32 16 32Z" fill="white" />
+              <path d="M0 16 C0 16 10 15 16 16 C10 17 0 16 0 16Z" fill="white" />
+              <circle cx="16" cy="16" r="2.5" fill="white" />
+            </svg>
           </div>
-        </section>
+          <div className="star star-bl">
+            <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 0 C16 0 17 10 16 16 C15 10 16 0 16 0Z" fill="white" />
+              <path d="M32 16 C32 16 22 17 16 16 C22 15 32 16 32 16Z" fill="white" />
+              <path d="M16 32 C16 32 15 22 16 16 C17 22 16 32 16 32Z" fill="white" />
+              <path d="M0 16 C0 16 10 15 16 16 C10 17 0 16 0 16Z" fill="white" />
+              <circle cx="16" cy="16" r="2.5" fill="white" />
+            </svg>
+          </div>
+          <div className="star star-br">
+            <svg width="36" height="36" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 0 C16 0 17 10 16 16 C15 10 16 0 16 0Z" fill="white" />
+              <path d="M32 16 C32 16 22 17 16 16 C22 15 32 16 32 16Z" fill="white" />
+              <path d="M16 32 C16 32 15 22 16 16 C17 22 16 32 16 32Z" fill="white" />
+              <path d="M0 16 C0 16 10 15 16 16 C10 17 0 16 0 16Z" fill="white" />
+              <circle cx="16" cy="16" r="2.5" fill="white" />
+            </svg>
+          </div>
 
-        {/* ─── CTA BAND ──────────────────────────────────────────── */}
-        <section className="py-16 bg-slate-50 border-t border-border-slate">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="bg-gradient-to-r from-primary-ocean to-sky-600 rounded-3xl p-10 md:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-xl relative overflow-hidden">
-              <div className="absolute right-0 bottom-0 h-40 w-40 bg-sky-400 rounded-full opacity-10 blur-2xl" />
-              <div className="space-y-2 relative z-10">
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white font-display">Ready to Place a Bulk Order?</h2>
-                <p className="text-sm text-sky-100 max-w-md">Our export team responds to all quote requests within 24 hours with a pro-forma invoice and shipping terms.</p>
-              </div>
-              <div className="flex gap-3 relative z-10 shrink-0">
-                <Link href="/contact" className="flex items-center gap-2 h-11 px-6 rounded-xl bg-white text-primary-ocean text-sm font-bold hover:bg-sky-50 transition-all shadow-md cursor-pointer">
-                  <MessageSquare className="h-4 w-4" /> Request Quote
-                </Link>
-                <a href="tel:+923001234567" className="flex items-center gap-2 h-11 px-6 rounded-xl border border-white/30 text-white text-sm font-bold hover:bg-white/10 transition-all cursor-pointer">
-                  <Phone className="h-4 w-4" /> Call Us
+          <div className="hero-inner-booking">
+            {/* LEFT TEXT */}
+            <div className="hero-booking-left">
+              <h1>
+                Experience<br />
+                Excellence with<br />
+                <span className="highlight">Modern Alloys.</span>
+              </h1>
+              <p>Advance and enhance clinical procedures with cutting-edge surgical solutions and expert precision forged directly to order.</p>
+              <div className="flex gap-3 mt-6">
+                <a href="tel:+923001234567" className="btn-book cursor-pointer">
+                  <Phone className="h-4 w-4" /> Call Factory
                 </a>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* ─── HOMEPAGE INQUIRY FORM ─────────────────────────────── */}
-        <section id="inquiry" className="py-20 bg-white border-t border-border-slate">
-          <div className="mx-auto max-w-2xl px-4 sm:px-6">
-            <div className="bg-white rounded-3xl border border-border-slate p-8 md:p-12 shadow-lg">
-              <div className="mb-8">
-                <span className="text-xs font-bold uppercase tracking-widest text-accent-blue">Direct Factory Quote</span>
-                <h2 className="text-2xl font-extrabold text-primary-ocean font-display mt-2">Request Pro-Forma Invoice</h2>
-                <p className="mt-2 text-xs text-muted-slate">Enter your requirements below. Our trade desk responds within 24 hours.</p>
-              </div>
+            {/* RIGHT CARD */}
+            <div className="hero-booking-card">
+              <h2>Have questions?<br />Get in touch!</h2>
               {inquiryStatus === 'success' ? (
                 <div className="py-10 text-center space-y-3">
-                  <div className="h-14 w-14 rounded-full bg-sky-50 text-accent-blue flex items-center justify-center mx-auto border border-sky-100">
+                  <div className="h-14 w-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto border border-blue-100">
                     <ShieldCheck className="h-7 w-7" />
                   </div>
-                  <h3 className="text-base font-bold text-primary-ocean font-display">Quote Request Logged</h3>
-                  <p className="text-xs text-muted-slate max-w-sm mx-auto">We've received your message. A pro-forma invoice will reach your inbox within 24 hours.</p>
-                  <button onClick={() => setInquiryStatus('idle')} className="text-xs font-bold text-accent-blue hover:underline cursor-pointer mt-2">Submit Another Inquiry</button>
+                  <h3 className="text-base font-bold text-slate-800 font-display">Inquiry Registered</h3>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">We have logged your query. Our trade representative will email you back within 24 hours.</p>
+                  <button onClick={() => setInquiryStatus('idle')} className="text-xs font-bold text-blue-600 hover:underline cursor-pointer mt-2">Submit Another</button>
                 </div>
               ) : (
                 <form onSubmit={handleInquirySubmit} className="space-y-4">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {[
-                      { name: 'name', label: 'Full Name *', type: 'text', placeholder: 'Dr. Ahmed Khan' },
-                      { name: 'organization', label: 'Clinic / Distributor *', type: 'text', placeholder: 'City Dental Care' },
-                    ].map(({ name, label, type, placeholder }) => (
-                      <div key={name}>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1.5">{label}</label>
-                        <input type={type} required value={(formData as any)[name]} onChange={(e) => setFormData({ ...formData, [name]: e.target.value })} placeholder={placeholder}
-                          className="w-full h-11 rounded-xl border border-border-slate bg-slate-50 px-4 text-xs focus:border-accent-blue focus:bg-white focus:outline-none transition-all" />
-                      </div>
-                    ))}
+                  <div className="hf-group">
+                    <input
+                      className="hf-input"
+                      type="text"
+                      placeholder="Your Name"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    />
+                    <input
+                      className="hf-input"
+                      type="email"
+                      placeholder="Your Email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    />
+                    <input
+                      className="hf-input"
+                      type="tel"
+                      placeholder="WhatsApp / Phone"
+                      required
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    />
+                    <input
+                      className="hf-input"
+                      type="text"
+                      placeholder="Clinic / Organization"
+                      value={formData.organization}
+                      onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
+                    />
+                    <select
+                      className="hf-select"
+                      value={formData.service}
+                      onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                    >
+                      <option>General Consultation</option>
+                      <option>Extracting Forceps MOQ Query</option>
+                      <option>Custom OEM Engraving</option>
+                      <option>Bulk Suture Kits</option>
+                      <option>Other / General Inquiry</option>
+                    </select>
+                    <div className="hf-icon-wrap">
+                      <input
+                        className="hf-input"
+                        type="date"
+                        required
+                        value={formData.date}
+                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      />
+                      <span className="hf-ico">📅</span>
+                    </div>
                   </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {[
-                      { name: 'email', label: 'Email *', type: 'email', placeholder: 'doctor@hospital.com' },
-                      { name: 'phone', label: 'WhatsApp / Phone *', type: 'tel', placeholder: '+92 300 1234567' },
-                    ].map(({ name, label, type, placeholder }) => (
-                      <div key={name}>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1.5">{label}</label>
-                        <input type={type} required value={(formData as any)[name]} onChange={(e) => setFormData({ ...formData, [name]: e.target.value })} placeholder={placeholder}
-                          className="w-full h-11 rounded-xl border border-border-slate bg-slate-50 px-4 text-xs focus:border-accent-blue focus:bg-white focus:outline-none transition-all" />
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Instruments Required *</label>
-                    <textarea rows={4} required value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder="List product SKUs, models, quantities, and any special requirements..."
-                      className="w-full rounded-xl border border-border-slate bg-slate-50 px-4 py-3 text-xs focus:border-accent-blue focus:bg-white focus:outline-none transition-all resize-none" />
-                  </div>
-                  <button type="submit" disabled={inquiryStatus === 'submitting'}
-                    className="w-full h-12 rounded-xl bg-primary-ocean text-white text-sm font-bold hover:bg-primary-ocean-hover transition-all shadow-md disabled:opacity-60 cursor-pointer">
-                    {inquiryStatus === 'submitting' ? 'Submitting...' : 'Send Quote Request'}
+                  <button type="submit" disabled={inquiryStatus === 'submitting'} className="hf-submit cursor-pointer">
+                    {inquiryStatus === 'submitting' ? 'Submitting...' : 'Submit Inquiry'}
                   </button>
                 </form>
               )}

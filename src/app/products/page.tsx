@@ -216,7 +216,7 @@ export default function Catalog() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Navbar />
-      <main className="flex-grow py-12 bg-slate-50/50">
+      <main className="flex-grow pt-[120px] pb-12 bg-slate-50/50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-6">
             <Link href="/" className="hover:text-slate-700">Home</Link>
