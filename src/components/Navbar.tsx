@@ -6,14 +6,12 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useMarket } from '../context/MarketContext';
 import { Search, Globe, Menu, X } from 'lucide-react';
-import MarketSelectorModal from './MarketSelectorModal';
 import LanguageSelector from './LanguageSelector';
 
 export default function Navbar() {
   const { market } = useMarket();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const navLinks = [
@@ -99,20 +97,16 @@ export default function Navbar() {
               </button>
             </form>
 
+            {/* Our Community Button */}
+            <Link
+              href="/community"
+              className="hidden sm:flex items-center justify-center h-8 px-4 rounded-full bg-blue-600 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-blue-700 transition-colors shadow-sm"
+            >
+              Our Community
+            </Link>
+
             {/* Language Selector */}
             <LanguageSelector />
-
-            {/* Currency / Market */}
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(true)}
-              style={{ touchAction: 'manipulation' }}
-              className="flex items-center justify-center gap-1 h-8 w-8 sm:w-auto sm:px-2.5 rounded-full border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600 hover:bg-white active:bg-slate-100 transition-all cursor-pointer"
-              aria-label="Select currency / market"
-            >
-              <Globe className="h-3.5 w-3.5 text-blue-600 shrink-0" />
-              <span className="hidden sm:inline text-[11px]">{market === 'pk' ? 'PKR' : 'USD'}</span>
-            </button>
 
           </div>
         </div>
@@ -130,7 +124,7 @@ export default function Navbar() {
       {/* ── MOBILE MENU DRAWER ── */}
       {isMobileMenuOpen && (
         <div
-          className="fixed z-[109] bg-white border border-slate-200 shadow-2xl rounded-2xl notranslate pointer-events-auto overflow-hidden"
+          className="fixed z-[109] bg-white border border-slate-200 shadow-2xl rounded-2xl notranslate pointer-events-auto"
           style={{ top: '82px', left: '12px', right: '12px' }}
         >
           {/* Mobile search */}
@@ -168,27 +162,22 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Mobile market selector row */}
-          <div className="px-4 pb-4 pt-2 border-t border-slate-100 flex items-center justify-between gap-3">
-            <LanguageSelector />
-            <button
-              type="button"
-              onClick={() => { setIsModalOpen(true); setIsMobileMenuOpen(false); }}
-              style={{ touchAction: 'manipulation' }}
-              className="flex items-center gap-1.5 h-9 px-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600 hover:bg-white transition-all cursor-pointer"
+          {/* Mobile bottom actions */}
+          <div className="px-4 pb-4 pt-3 border-t border-slate-100 flex flex-col gap-3">
+            <Link
+              href="/community"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center justify-center w-full h-10 rounded-xl bg-blue-600 text-white text-sm font-bold tracking-wide hover:bg-blue-700 transition-colors shadow-sm"
             >
-              <Globe className="h-3.5 w-3.5 text-blue-600" />
-              {market === 'pk' ? 'PKR — Pakistan' : 'USD — International'}
-            </button>
+              Our Community
+            </Link>
+            <div className="flex justify-center">
+              <LanguageSelector />
+            </div>
           </div>
         </div>
       )}
 
-      {/* Market modal */}
-      {isModalOpen && (
-        <MarketSelectorModal forceShow={true} onClose={() => setIsModalOpen(false)} />
-      )}
-      <MarketSelectorModal forceShow={false} />
     </>
   );
 }

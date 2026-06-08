@@ -1424,6 +1424,16 @@ html, body {
     width: 100%;
     max-width: 440px;
   }
+  .expert-section .content {
+    text-align: center;
+  }
+  .expert-section .btn {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero-booking-left .flex {
+    justify-content: center;
+  }
 }
 
 @media(max-width:768px) {

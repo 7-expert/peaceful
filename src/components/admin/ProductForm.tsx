@@ -18,7 +18,6 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
   const [sku, setSku] = useState('');
   const [category, setCategory] = useState('Extracting Forceps');
   const [description, setDescription] = useState('');
-  const [pricePkr, setPricePkr] = useState('');
   const [priceUsd, setPriceUsd] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
@@ -37,7 +36,6 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
     setSku(initialData.sku || '');
     setCategory(initialData.category || 'Extracting Forceps');
     setDescription(initialData.description || '');
-    setPricePkr(initialData.price_pkr?.toString() || '');
     setPriceUsd(initialData.price_usd?.toString() || '');
     setImageUrl(initialData.image_url || '');
     setIsFeatured(initialData.is_featured || false);
@@ -70,7 +68,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!name || !sku || !pricePkr || !priceUsd || !description) {
+    if (!name || !sku || !priceUsd || !description) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -81,7 +79,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
     });
     const payload = {
       sku: sku.trim(), name: name.trim(), category, description: description.trim(),
-      price_pkr: parseFloat(pricePkr), price_usd: parseFloat(priceUsd),
+      price_usd: parseFloat(priceUsd),
       image_url: imageUrl, is_featured: isFeatured, stock_status: stockStatus,
       specifications: specificationsObj,
       slug: slugify(name.trim()),
@@ -147,10 +145,6 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
 
       {/* Row 3: Prices */}
       <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <label className={labelClass}>Price PKR (Pakistan) *</label>
-          <input type="number" required min="0" value={pricePkr} onChange={e => setPricePkr(e.target.value)} placeholder="4500" className={fieldClass} />
-        </div>
         <div>
           <label className={labelClass}>Price USD (International) *</label>
           <input type="number" required min="0" step="0.01" value={priceUsd} onChange={e => setPriceUsd(e.target.value)} placeholder="48.00" className={fieldClass} />

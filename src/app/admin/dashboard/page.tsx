@@ -215,7 +215,6 @@ export default function AdminDashboard() {
                       <th className="px-6 py-4">Instrument Specification</th>
                       <th className="px-6 py-4">SKU Code</th>
                       <th className="px-6 py-4">Category Group</th>
-                      <th className="px-6 py-4 text-right">Price (PKR)</th>
                       <th className="px-6 py-4 text-right">Price (USD)</th>
                       <th className="px-6 py-4">Availability</th>
                       <th className="px-6 py-4 text-center">Actions</th>
@@ -237,7 +236,6 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-6 py-4 font-mono text-slate-400 font-semibold">{p.sku}</td>
                         <td className="px-6 py-4 text-slate-500 font-medium">{p.category}</td>
-                        <td className="px-6 py-4 text-right font-extrabold text-slate-700">Rs. {p.price_pkr?.toLocaleString()}</td>
                         <td className="px-6 py-4 text-right font-extrabold text-slate-700">${p.price_usd}</td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold ${

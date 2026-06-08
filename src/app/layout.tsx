@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MarketProvider } from "../context/MarketContext";
+import FloatingWhatsApp from "../components/FloatingWhatsApp";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground antialiased selection:bg-accent-blue selection:text-white">
         <MarketProvider>
           {children}
+          <FloatingWhatsApp />
         </MarketProvider>
       </body>
     </html>
