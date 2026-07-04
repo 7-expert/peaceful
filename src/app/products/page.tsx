@@ -114,9 +114,8 @@ function CatalogContent() {
             <div className="space-y-1">
               <button
                 onClick={() => setSelectedCategory('')}
-                className={`w-full text-left text-xs px-3.5 py-2.5 rounded-lg font-medium transition-all cursor-pointer ${
-                  !selectedCategory ? 'bg-sky-50 text-accent-blue font-bold' : 'text-slate-500 hover:bg-slate-50'
-                }`}
+                className={`w-full text-left text-xs px-3.5 py-2.5 rounded-lg font-medium transition-all cursor-pointer ${!selectedCategory ? 'bg-sky-50 text-accent-blue font-bold' : 'text-slate-500 hover:bg-slate-50'
+                  }`}
               >
                 All Instruments
               </button>
@@ -124,9 +123,8 @@ function CatalogContent() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`w-full text-left text-xs px-3.5 py-2.5 rounded-lg font-medium transition-all cursor-pointer ${
-                    selectedCategory === cat ? 'bg-sky-50 text-accent-blue font-bold' : 'text-slate-500 hover:bg-slate-50'
-                  }`}
+                  className={`w-full text-left text-xs px-3.5 py-2.5 rounded-lg font-medium transition-all cursor-pointer ${selectedCategory === cat ? 'bg-sky-50 text-accent-blue font-bold' : 'text-slate-500 hover:bg-slate-50'
+                    }`}
                 >
                   {cat}
                 </button>

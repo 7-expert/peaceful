@@ -63,7 +63,7 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-grow">
-        
+
         {/* ─── 1. DENTAL HERO SECTION ──────────────────────────────── */}
         <section className="dental-hero" style={{ marginTop: 0 }}>
           <div className="hero-content">
@@ -72,7 +72,7 @@ export default function Home() {
               Your <span>Instruments</span>
             </h1>
             <p>
-              Experience top-grade, precision-manufactured German stainless steel dental instruments designed for healthcare excellence.
+              Experience top-grade, precision-manufactured stainless steel dental instruments designed for healthcare excellence.
             </p>
             <Link href="/products" className="hero-btn cursor-pointer">
               View Catalog →
@@ -105,7 +105,7 @@ export default function Home() {
             {/* LEFT IMAGE */}
             <div className="image-box border border-slate-200 shadow-md">
               <img
-                src="https://images.unsplash.com/photo-1609840114035-3c981b782dfe?q=80&w=1200&auto=format&fit=crop"
+                src="https://plus.unsplash.com/premium_photo-1672922646348-b8129dbd3c54?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Instrument Production Quality"
               />
             </div>
@@ -128,7 +128,7 @@ export default function Home() {
                     <img src="https://doccure.dreamstechnologies.com/html/template/assets/img/icons/about-icon-one.svg" alt="Quality" />
                   </div>
                   <h4>Best Stainless Steel</h4>
-                  <p>Certified German and French steel alloys for strength.</p>
+                  <p>Certified steel alloys for strength.</p>
                 </div>
 
                 {/* Card 2 */}
@@ -286,7 +286,7 @@ export default function Home() {
               <div className="feature">
                 <h3>Guaranteed Replacement</h3>
                 <div className="line"></div>
-                <p>Every single instrument comes with our signature 5-year replacement guarantee.</p>
+                <p>Every single instrument comes with our signature replacement guarantee.</p>
               </div>
             </div>
 
@@ -416,7 +416,7 @@ export default function Home() {
             <div className="mb-track">
               <div className="mb-item"><span className="mb-icon">✚</span><span>FDA Registered Manufacturing</span></div>
               <div className="mb-item"><span className="mb-icon">✚</span><span>AISI 410 German Alloys</span></div>
-              <div className="mb-item"><span className="mb-icon">✚</span><span>5-Year Replacement Guarantee</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>Signature Replacement Guarantee</span></div>
               <div className="mb-item"><span className="mb-icon">✚</span><span>CE Declaration of Conformity</span></div>
               <div className="mb-item"><span className="mb-icon">✚</span><span>Global DHL &amp; FedEx Cargo</span></div>
               <div className="mb-item"><span className="mb-icon">✚</span><span>Laser Engraved Custom Branding</span></div>
@@ -425,7 +425,7 @@ export default function Home() {
               {/* Loop Duplicate */}
               <div className="mb-item"><span className="mb-icon">✚</span><span>FDA Registered Manufacturing</span></div>
               <div className="mb-item"><span className="mb-icon">✚</span><span>AISI 410 German Alloys</span></div>
-              <div className="mb-item"><span className="mb-icon">✚</span><span>5-Year Replacement Guarantee</span></div>
+              <div className="mb-item"><span className="mb-icon">✚</span><span>Signature Replacement Guarantee</span></div>
               <div className="mb-item"><span className="mb-icon">✚</span><span>CE Declaration of Conformity</span></div>
               <div className="mb-item"><span className="mb-icon">✚</span><span>Global DHL &amp; FedEx Cargo</span></div>
               <div className="mb-item"><span className="mb-icon">✚</span><span>Laser Engraved Custom Branding</span></div>

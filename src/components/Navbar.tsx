@@ -69,11 +69,10 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${
-                  pathname === link.href
+                className={`text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${pathname === link.href
                     ? 'text-blue-600'
                     : 'text-slate-600 hover:text-blue-600'
-                }`}
+                  }`}
               >
                 {link.name}
               </Link>
@@ -97,10 +96,12 @@ export default function Navbar() {
               </button>
             </form>
 
-            {/* Our Community Button */}
+            {/* WhatsApp Button */}
             <Link
-              href="/community"
-              className="hidden sm:flex items-center justify-center h-8 px-4 rounded-full bg-blue-600 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-blue-700 transition-colors shadow-sm"
+              href="https://wa.me/923001234567"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:flex items-center justify-center h-8 px-4 rounded-full bg-blue-600 text-white text-[11px] font-bold uppercase tracking-wider hover:bg-green-600 transition-colors shadow-sm"
             >
               Our Community
             </Link>
@@ -151,11 +152,10 @@ export default function Navbar() {
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 style={{ touchAction: 'manipulation' }}
-                className={`flex items-center py-3 px-4 text-sm font-semibold rounded-xl transition-colors ${
-                  pathname === link.href
+                className={`flex items-center py-3 px-4 text-sm font-semibold rounded-xl transition-colors ${pathname === link.href
                     ? 'text-blue-600 bg-sky-50'
                     : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50 active:bg-slate-100'
-                }`}
+                  }`}
               >
                 {link.name}
               </Link>
@@ -165,11 +165,13 @@ export default function Navbar() {
           {/* Mobile bottom actions */}
           <div className="px-4 pb-4 pt-3 border-t border-slate-100 flex flex-col gap-3">
             <Link
-              href="/community"
+              href="https://wa.me/923001234567"
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="flex items-center justify-center w-full h-10 rounded-xl bg-blue-600 text-white text-sm font-bold tracking-wide hover:bg-blue-700 transition-colors shadow-sm"
+              className="flex items-center justify-center w-full h-10 rounded-xl bg-blue-600 text-white text-sm font-bold tracking-wide hover:bg-green-600 transition-colors shadow-sm"
             >
-              Our Community
+              WhatsApp
             </Link>
             <div className="flex justify-center">
               <LanguageSelector />
