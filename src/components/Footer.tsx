@@ -84,7 +84,7 @@ export default function Footer() {
                 </div>
                 <div className="ft-service-item flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl">
                   <div className="ft-service-icon shrink-0"><Phone className="h-4 w-4" /></div>
-                  <span className="ft-service-text text-xs text-slate-700">+92 52 4567890</span>
+                  <span className="ft-service-text text-xs text-slate-700">0324-4505238</span>
                 </div>
                 <div className="ft-service-item flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl">
                   <div className="ft-service-icon shrink-0"><Mail className="h-4 w-4" /></div>
