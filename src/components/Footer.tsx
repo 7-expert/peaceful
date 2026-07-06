@@ -19,7 +19,7 @@ export default function Footer() {
 
       {/* MAIN GRID */}
       <div className="ft-main max-w-6xl mx-auto px-6 py-14 relative z-10">
-        
+
         {/* COL 1: Brand */}
         <div className="ft-brand space-y-5">
           <div className="ft-logo notranslate">
@@ -37,16 +37,16 @@ export default function Footer() {
           </p>
           <div className="ft-socials flex gap-2">
             <a className="ft-social" href="#" aria-label="Facebook">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" /></svg>
             </a>
             <a className="ft-social" href="#" aria-label="X">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
             </a>
             <a className="ft-social" href="#" aria-label="Instagram">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" /><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>
             </a>
             <a className="ft-social" href="#" aria-label="LinkedIn">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" /><circle cx="4" cy="4" r="2" /></svg>
             </a>
           </div>
         </div>
@@ -69,7 +69,7 @@ export default function Footer() {
                 </div>
                 <div className="ft-service-item flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl">
                   <div className="ft-service-icon shrink-0"><Phone className="h-4 w-4" /></div>
-                  <span className="ft-service-text text-xs text-slate-700">+92 300 1234567</span>
+                  <span className="ft-service-text text-xs text-slate-700">0324-4505238</span>
                 </div>
                 <div className="ft-service-item flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl">
                   <div className="ft-service-icon shrink-0"><Mail className="h-4 w-4" /></div>
@@ -105,7 +105,7 @@ export default function Footer() {
           <form onSubmit={(e) => { e.preventDefault(); alert('Subscribed successfully!'); }} className="ft-email-wrap flex items-center bg-slate-100/80 border border-slate-200 rounded-xl p-1 pl-4 mb-4">
             <input type="email" placeholder="Your Email Address" className="w-full bg-transparent border-none outline-none text-xs" required />
             <button type="submit" className="ft-email-btn shrink-0" aria-label="Subscribe">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
             </button>
           </form>
           <div className="ft-community space-y-1">
@@ -122,7 +122,7 @@ export default function Footer() {
       {/* SCROLL TOP */}
       <div className="ft-top-btn">
         <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Back to top">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="18 15 12 9 6 15" /></svg>
         </button>
       </div>
 
