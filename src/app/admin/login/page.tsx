@@ -51,7 +51,7 @@ export default function AdminLogin() {
           {/* Logo and Title */}
           <div className="flex flex-col items-center justify-center mb-8 text-center">
             <Image
-              src="/logo4.png"
+              src="/logo.svg"
               alt="Peaceful Dental Solutions Logo"
               width={100}
               height={100}

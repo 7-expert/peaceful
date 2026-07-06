@@ -93,7 +93,7 @@ export default function Home() {
           <img
             src="https://i.pinimg.com/1200x/03/f2/fa/03f2faf1c1aec554604ceaeb08435d72.jpg"
             alt="Dental background decoration left"
-            className="shape-left-img"
+            className="shape-left-img hidden lg:block"
           />
           <img
             src="https://i.pinimg.com/736x/e3/86/22/e386223c0759a15e2ffcc258fc91ef8b.jpg"
@@ -205,7 +205,7 @@ export default function Home() {
             {/* LEFT */}
             <div className="left-content">
               <div className="tag">Who We Are</div>
-              <div className="star-shape">✷</div>
+              <div className="star-shape max-md:mr-[-10%]">✷</div>
               <div className="big-number">28</div>
               {/* Mobile-only horizontal years label (vertical-text is hidden on mobile) */}
               <span className="years-label-mobile hidden">Years Of Manufacturing Excellence</span>
@@ -292,7 +292,7 @@ export default function Home() {
 
             {/* CENTER */}
             <div className="center-image">
-              <img src="/image1.png" alt="Dental instrument detail" className="max-w-xs" />
+              <img src="/instrument.svg" alt="Dental instrument detail" className="max-w-xs lg:max-w-[450px]" />
             </div>
 
             {/* RIGHT */}

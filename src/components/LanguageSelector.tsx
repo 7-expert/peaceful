@@ -239,7 +239,7 @@ export default function LanguageSelector() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '28px', maxWidth: '360px', padding: '0 24px', textAlign: 'center' }}>
             {/* Logo */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo4.png" alt="Logo" style={{ height: '64px', width: 'auto', objectFit: 'contain' }} />
+            <img src="/logo.svg" alt="Logo" style={{ height: '64px', width: 'auto', objectFit: 'contain' }} />
             {/* Spinner */}
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{

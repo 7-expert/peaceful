@@ -24,7 +24,7 @@ export default function Footer() {
         <div className="ft-brand space-y-5">
           <div className="ft-logo notranslate">
             <Image
-              src="/logo4.png"
+              src="/logo.svg"
               alt="Peaceful Dental Solutions"
               width={233}
               height={100}

@@ -54,7 +54,7 @@ export default function Navbar() {
             aria-label="Peaceful Dental Solutions — Home"
           >
             <Image
-              src="/logo4.png"
+              src="/logo.svg"
               alt="Peaceful Dental Solutions"
               width={100}
               height={100}

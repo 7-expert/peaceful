@@ -8,9 +8,9 @@ export const metadata: Metadata = {
   description: "Certified, high-grade German and American stainless steel dental instruments. Trusted by clinics, surgical centers, and distributors across Pakistan and 45+ countries worldwide.",
   keywords: "dental instruments, surgical instruments, extracting forceps, dental pliers, suture kits, Pakistan exporter, international dental supply, Peaceful Dental Solutions",
   icons: {
-    icon: "/logo4.png",
-    shortcut: "/logo4.png",
-    apple: "/logo4.png",
+    icon: "/logo.svg",
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
   },
 };
 

@@ -111,7 +111,7 @@ export default function AdminDashboard() {
               <ArrowLeft className="h-4 w-4" />
             </Link>
             <div className="h-9 w-9 rounded-lg border border-slate-100 bg-slate-50 flex items-center justify-center p-1">
-              <Image src="/logo.png" alt="Peaceful Dental Solutions Logo" width={24} height={24} className="object-contain" />
+              <Image src="/logo.svg" alt="Peaceful Dental Solutions Logo" width={24} height={24} className="object-contain" />
             </div>
             <div>
               <div className="text-sm font-bold text-primary-ocean font-display">Staff Control Panel</div>
