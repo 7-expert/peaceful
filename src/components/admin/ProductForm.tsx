@@ -104,9 +104,10 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
       tags: tagsArray,
       feature_bullets: featureBullets.filter(b => b.trim()),
       price_usd: parseFloat(priceUsd),
+      price_pkr: Math.round(parseFloat(priceUsd) * 280), // Approx calculation to satisfy DB constraint
       image_url: imageUrl, is_featured: isFeatured, stock_status: stockStatus,
       specifications: specificationsObj,
-      slug: slugify(name.trim()),
+      slug: initialData?.slug || (slugify(name.trim()) + '-' + Math.random().toString(36).substring(2, 8)),
     };
     try {
       if (initialData?.id) {
