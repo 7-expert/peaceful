@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useMarket } from '../context/MarketContext';
-import { Search, Globe, Menu, X } from 'lucide-react';
+import { Search, Globe, Menu, X, ChevronDown } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 
 export default function Navbar() {
@@ -17,6 +17,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Products', href: '/products' },
+    { name: 'Categories', href: '#' },
     { name: 'Certifications', href: '/certifications' },
     { name: 'About Us', href: '/about' },
     { name: 'Contact Us', href: '/contact' },
@@ -65,18 +66,42 @@ export default function Navbar() {
 
           {/* ── DESKTOP NAV (md+) ── */}
           <nav className="hidden md:flex items-center gap-6 flex-1 justify-center">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${pathname === link.href
-                    ? 'text-blue-600'
-                    : 'text-slate-600 hover:text-blue-600'
-                  }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              if (link.name === 'Categories') {
+                return (
+                  <div key={link.name} className="relative group cursor-pointer">
+                    <div
+                      className={`text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors flex items-center gap-1 ${pathname.startsWith('/products?category')
+                          ? 'text-blue-600'
+                          : 'text-slate-600 hover:text-blue-600'
+                        }`}
+                    >
+                      {link.name}
+                      <ChevronDown className="h-3 w-3 ml-0.5" />
+                    </div>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                      <div className="w-56 bg-white border border-slate-200 shadow-xl rounded-xl py-2 flex flex-col pointer-events-auto">
+                        <Link href="/products?category=Composite%20Filling%20Tools" className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition-colors">Composite Filling Tools</Link>
+                        <Link href="/products?category=Excavators" className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition-colors">Excavators</Link>
+                        <Link href="/products?category=Gingival%20Cord%20packers" className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition-colors">Gingival Cord packers</Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${pathname === link.href
+                      ? 'text-blue-600'
+                      : 'text-slate-600 hover:text-blue-600'
+                    }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* ── RIGHT ACTIONS ── */}
@@ -146,20 +171,42 @@ export default function Navbar() {
 
           {/* Nav links */}
           <nav className="px-3 py-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                style={{ touchAction: 'manipulation' }}
-                className={`flex items-center py-3 px-4 text-sm font-semibold rounded-xl transition-colors ${pathname === link.href
-                    ? 'text-blue-600 bg-sky-50'
-                    : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50 active:bg-slate-100'
-                  }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              if (link.name === 'Categories') {
+                return (
+                  <div key={link.name} className="flex flex-col">
+                    <div
+                      className={`flex items-center justify-between py-3 px-4 text-sm font-semibold rounded-xl transition-colors ${pathname.startsWith('/products?category')
+                          ? 'text-blue-600 bg-sky-50'
+                          : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50 active:bg-slate-100'
+                        }`}
+                    >
+                      <span>{link.name}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </div>
+                    <div className="pl-6 pr-4 py-1 flex flex-col gap-1">
+                      <Link href="/products?category=Composite%20Filling%20Tools" onClick={() => setIsMobileMenuOpen(false)} className="py-2 px-3 text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-slate-50 rounded-lg">Composite Filling Tools</Link>
+                      <Link href="/products?category=Excavators" onClick={() => setIsMobileMenuOpen(false)} className="py-2 px-3 text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-slate-50 rounded-lg">Excavators</Link>
+                      <Link href="/products?category=Gingival%20Cord%20packers" onClick={() => setIsMobileMenuOpen(false)} className="py-2 px-3 text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-slate-50 rounded-lg">Gingival Cord packers</Link>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  style={{ touchAction: 'manipulation' }}
+                  className={`flex items-center py-3 px-4 text-sm font-semibold rounded-xl transition-colors ${pathname === link.href
+                      ? 'text-blue-600 bg-sky-50'
+                      : 'text-slate-700 hover:text-blue-600 hover:bg-slate-50 active:bg-slate-100'
+                    }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Mobile bottom actions */}

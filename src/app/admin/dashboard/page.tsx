@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabase';
 import ProductForm from '../../../components/admin/ProductForm';
-import { Plus, Edit3, Trash2, LogOut, Search, Loader2, Package, Star, AlertCircle, ArrowLeft, ClipboardList, MailOpen } from 'lucide-react';
+import { Plus, Edit3, Trash2, LogOut, Search, Loader2, Package, Star, AlertCircle, ArrowLeft, ClipboardList, MailOpen, Check, X } from 'lucide-react';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function AdminDashboard() {
   const [loadingSession, setLoadingSession] = useState(true);
 
   // Tabs state
-  const [activeTab, setActiveTab] = useState<'products' | 'inquiries'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'inquiries' | 'reviews'>('products');
 
   // Products state
   const [products, setProducts] = useState<any[]>([]);
@@ -27,6 +27,11 @@ export default function AdminDashboard() {
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [loadingInquiries, setLoadingInquiries] = useState(true);
   const [inquirySearch, setInquirySearch] = useState('');
+
+  // Reviews state
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [reviewSearch, setReviewSearch] = useState('');
 
   useEffect(() => {
     async function checkAuth() {
@@ -52,10 +57,23 @@ export default function AdminDashboard() {
     setLoadingInquiries(false);
   };
 
+  const fetchReviews = async () => {
+    setLoadingReviews(true);
+    const { data, error } = await supabase.from('reviews').select(`
+      *,
+      products ( name, sku )
+    `).order('created_at', { ascending: false });
+    if (!error && data) {
+      setReviews(data);
+    }
+    setLoadingReviews(false);
+  };
+
   useEffect(() => {
     if (session) {
       fetchProducts();
       fetchInquiries();
+      fetchReviews();
     }
   }, [session]);
 
@@ -71,9 +89,20 @@ export default function AdminDashboard() {
     fetchInquiries();
   };
 
+  const handleReviewDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this review?')) return;
+    await supabase.from('reviews').delete().eq('id', id);
+    fetchReviews();
+  };
+
   const handleStatusChange = async (id: string, newStatus: string) => {
     await supabase.from('inquiries').update({ status: newStatus }).eq('id', id);
     fetchInquiries();
+  };
+
+  const handleReviewApproval = async (id: string, is_approved: boolean) => {
+    await supabase.from('reviews').update({ is_approved }).eq('id', id);
+    fetchReviews();
   };
 
   const handleLogout = async () => {
@@ -92,6 +121,12 @@ export default function AdminDashboard() {
     (i.organization && i.organization.toLowerCase().includes(inquirySearch.toLowerCase())) ||
     i.email.toLowerCase().includes(inquirySearch.toLowerCase()) ||
     (i.product_sku && i.product_sku.toLowerCase().includes(inquirySearch.toLowerCase()))
+  );
+
+  const filteredReviews = reviews.filter(r =>
+    r.reviewer_name.toLowerCase().includes(reviewSearch.toLowerCase()) ||
+    r.comment.toLowerCase().includes(reviewSearch.toLowerCase()) ||
+    (r.products?.name && r.products.name.toLowerCase().includes(reviewSearch.toLowerCase()))
   );
 
   if (loadingSession) return (
@@ -130,17 +165,18 @@ export default function AdminDashboard() {
       <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
         {/* Metrics Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           {[
-            { label: 'Total Instruments', value: products.length, icon: <Package className="h-5 w-5 text-accent-blue" />, bg: 'bg-sky-50' },
+            { label: 'Instruments', value: products.length, icon: <Package className="h-5 w-5 text-accent-blue" />, bg: 'bg-sky-50' },
             { label: 'Pending Inquiries', value: inquiries.filter(i => i.status === 'pending').length, icon: <MailOpen className="h-5 w-5 text-amber-500" />, bg: 'bg-amber-50' },
-            { label: 'Out of Stock Items', value: products.filter(p => p.stock_status === 'out_of_stock').length, icon: <AlertCircle className="h-5 w-5 text-red-500" />, bg: 'bg-red-50' },
+            { label: 'Pending Reviews', value: reviews.filter(r => !r.is_approved).length, icon: <Star className="h-5 w-5 text-purple-500" />, bg: 'bg-purple-50' },
+            { label: 'Out of Stock', value: products.filter(p => p.stock_status === 'out_of_stock').length, icon: <AlertCircle className="h-5 w-5 text-red-500" />, bg: 'bg-red-50' },
           ].map(({ label, value, icon, bg }) => (
-            <div key={label} className="bg-white rounded-2xl border border-border-slate p-6 flex items-center gap-4 shadow-xs">
+            <div key={label} className="bg-white rounded-2xl border border-border-slate p-5 flex items-center gap-4 shadow-xs">
               <div className={`h-11 w-11 rounded-xl ${bg} flex items-center justify-center shrink-0`}>{icon}</div>
               <div>
                 <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{label}</div>
-                <div className="text-2xl font-extrabold text-primary-ocean font-display mt-0.5">{value}</div>
+                <div className="text-xl font-extrabold text-primary-ocean font-display mt-0.5">{value}</div>
               </div>
             </div>
           ))}
@@ -170,6 +206,18 @@ export default function AdminDashboard() {
           >
             <span className="flex items-center gap-2">
               <ClipboardList className="h-4 w-4" /> Bulk Inquiries Log ({inquiries.length})
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className={`pb-3 text-sm font-bold font-display border-b-2 px-1 transition-all cursor-pointer ${
+              activeTab === 'reviews'
+                ? 'border-accent-blue text-accent-blue'
+                : 'border-transparent text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <Star className="h-4 w-4" /> Reviews Management ({reviews.length})
             </span>
           </button>
         </div>
@@ -380,20 +428,119 @@ export default function AdminDashboard() {
             )}
           </div>
         )}
+
+        {/* Tab 3: Reviews Management */}
+        {activeTab === 'reviews' && (
+          <div className="bg-white rounded-2xl border border-border-slate overflow-hidden shadow-xs">
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-4 bg-white">
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  placeholder="Filter reviews by reviewer or product..."
+                  value={reviewSearch}
+                  onChange={(e) => setReviewSearch(e.target.value)}
+                  className="h-10 w-80 rounded-xl border border-border-slate bg-slate-50 pl-10 pr-3 text-xs focus:border-accent-blue focus:bg-white focus:outline-none transition-all"
+                />
+                <Search className="absolute left-3.5 h-4 w-4 text-slate-400" />
+              </div>
+            </div>
+
+            {loadingReviews ? (
+              <div className="py-20 flex flex-col items-center justify-center text-xs text-slate-400 gap-2">
+                <Loader2 className="h-6 w-6 animate-spin text-accent-blue" />
+                <span>Syncing reviews...</span>
+              </div>
+            ) : filteredReviews.length === 0 ? (
+              <div className="py-20 text-center text-xs text-slate-400">
+                {reviewSearch ? 'No reviews matched your search criteria.' : 'No reviews received yet.'}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead>
+                    <tr className="border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50">
+                      <th className="px-6 py-4">Reviewer</th>
+                      <th className="px-6 py-4">Product</th>
+                      <th className="px-6 py-4">Rating</th>
+                      <th className="px-6 py-4 w-1/3">Comment</th>
+                      <th className="px-6 py-4 text-center">Status</th>
+                      <th className="px-6 py-4 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredReviews.map((rev) => (
+                      <tr key={rev.id} className="hover:bg-slate-50/50 transition-colors align-top">
+                        <td className="px-6 py-4">
+                          <div className="font-bold text-primary-ocean font-display">{rev.reviewer_name}</div>
+                          <div className="text-[10px] text-slate-400 mt-0.5">{rev.reviewer_email}</div>
+                          <div className="text-[9px] text-slate-400 font-mono mt-1">
+                            {new Date(rev.created_at).toLocaleString()}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {rev.products ? (
+                            <div>
+                              <div className="font-bold text-slate-700 line-clamp-1">{rev.products.name}</div>
+                              <div className="text-[10px] text-slate-400 font-mono mt-0.5">{rev.products.sku}</div>
+                            </div>
+                          ) : (
+                            <span className="text-slate-400 italic">Deleted Product</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map(i => (
+                              <Star key={i} className={`h-3.5 w-3.5 ${i <= rev.rating ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'}`} />
+                            ))}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="text-slate-600 line-clamp-3 hover:line-clamp-none cursor-pointer">
+                            {rev.comment}
+                          </p>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <button
+                            onClick={() => handleReviewApproval(rev.id, !rev.is_approved)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-bold cursor-pointer transition-colors ${
+                              rev.is_approved 
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100' 
+                                : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+                            }`}
+                          >
+                            {rev.is_approved ? <><Check className="h-3 w-3" /> Approved</> : <><X className="h-3 w-3" /> Pending</>}
+                          </button>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <button
+                            onClick={() => handleReviewDelete(rev.id)}
+                            className="h-8 w-8 inline-flex items-center justify-center rounded-xl border border-border-slate text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-white transition-all cursor-pointer shadow-xs"
+                            title="Delete review"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
       </main>
 
       {/* Modal dialog wrapper */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="w-full max-w-2xl bg-white rounded-3xl border border-border-slate shadow-2xl overflow-hidden">
+          <div className="w-full max-w-2xl bg-white rounded-3xl border border-border-slate shadow-2xl overflow-hidden mt-10">
             <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
               <h2 className="text-base font-bold text-primary-ocean font-display">
                 {editingProduct ? 'Update Instrument Parameters' : 'Add New Instrument'}
               </h2>
               <button onClick={() => setIsFormOpen(false)} className="text-slate-300 hover:text-slate-600 transition-colors cursor-pointer">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-5 w-5" />
               </button>
             </div>
             <div className="p-6">

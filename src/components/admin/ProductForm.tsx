@@ -11,12 +11,24 @@ interface ProductFormProps {
   onCancel: () => void;
 }
 
-const CATEGORIES = ['Extracting Forceps', 'Dental Pliers', 'Surgery Kits', 'Periodontal', 'Orthodontic'];
+const CATEGORIES = ['Composite Filling Tools', 'Excavators', 'Gingival Cord packers'];
+
+const DEFAULT_BULLETS = [
+  'Precision Engineering',
+  'Ergonomic Design',
+  'High-Quality Materials',
+  'ISO-Certified',
+  'Lightweight Construction',
+  'Signature Guarantee',
+];
 
 export default function ProductForm({ initialData, onSuccess, onCancel }: ProductFormProps) {
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
-  const [category, setCategory] = useState('Extracting Forceps');
+  const [category, setCategory] = useState('Composite Filling Tools');
+  const [productType, setProductType] = useState('');
+  const [size, setSize] = useState('');
+  const [tags, setTags] = useState('');
   const [description, setDescription] = useState('');
   const [priceUsd, setPriceUsd] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -24,8 +36,9 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
   const [stockStatus, setStockStatus] = useState('in_stock');
   const [specs, setSpecs] = useState<{ key: string; value: string }[]>([
     { key: 'Material', value: 'AISI 410 German Stainless Steel' },
-    { key: 'Warranty', value: '5 Years Replacement' },
+    { key: 'Warranty', value: 'Signature Guarantee' },
   ]);
+  const [featureBullets, setFeatureBullets] = useState<string[]>(DEFAULT_BULLETS);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -34,7 +47,10 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
     if (!initialData) return;
     setName(initialData.name || '');
     setSku(initialData.sku || '');
-    setCategory(initialData.category || 'Extracting Forceps');
+    setCategory(initialData.category || 'Composite Filling Tools');
+    setProductType(initialData.product_type || '');
+    setSize(initialData.size || '');
+    setTags(initialData.tags ? initialData.tags.join(', ') : '');
     setDescription(initialData.description || '');
     setPriceUsd(initialData.price_usd?.toString() || '');
     setImageUrl(initialData.image_url || '');
@@ -43,6 +59,9 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
     if (initialData.specifications) {
       const pairs = Object.entries(initialData.specifications).map(([k, v]) => ({ key: k, value: v as string }));
       setSpecs(pairs.length > 0 ? pairs : [{ key: '', value: '' }]);
+    }
+    if (initialData.feature_bullets && initialData.feature_bullets.length > 0) {
+      setFeatureBullets(initialData.feature_bullets);
     }
   }, [initialData]);
 
@@ -77,8 +96,13 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
     specs.forEach(({ key, value }) => {
       if (key.trim() && value.trim()) specificationsObj[key.trim()] = value.trim();
     });
+    const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
     const payload = {
       sku: sku.trim(), name: name.trim(), category, description: description.trim(),
+      product_type: productType.trim(),
+      size: size.trim(),
+      tags: tagsArray,
+      feature_bullets: featureBullets.filter(b => b.trim()),
       price_usd: parseFloat(priceUsd),
       image_url: imageUrl, is_featured: isFeatured, stock_status: stockStatus,
       specifications: specificationsObj,
@@ -113,7 +137,7 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
         </div>
       )}
 
-      {/* Row 1 */}
+      {/* Row 1: Name + SKU */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>Product Name *</label>
@@ -125,13 +149,25 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
         </div>
       </div>
 
-      {/* Row 2 */}
+      {/* Row 2: Category + Type */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>Category *</label>
           <select value={category} onChange={e => setCategory(e.target.value)} className={fieldClass + " font-medium"}>
             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
+        </div>
+        <div>
+          <label className={labelClass}>Product Type</label>
+          <input type="text" value={productType} onChange={e => setProductType(e.target.value)} placeholder="e.g. Surgical Set, Hand Instrument" className={fieldClass} />
+        </div>
+      </div>
+
+      {/* Row 3: Size + Stock Status */}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Size</label>
+          <input type="text" value={size} onChange={e => setSize(e.target.value)} placeholder="e.g. Standard, Large, Different sizes available" className={fieldClass} />
         </div>
         <div>
           <label className={labelClass}>Stock Status *</label>
@@ -143,11 +179,15 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
         </div>
       </div>
 
-      {/* Row 3: Prices */}
+      {/* Row 4: Price + Tags */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>Price USD (International) *</label>
           <input type="number" required min="0" step="0.01" value={priceUsd} onChange={e => setPriceUsd(e.target.value)} placeholder="48.00" className={fieldClass} />
+        </div>
+        <div>
+          <label className={labelClass}>Tags (comma separated)</label>
+          <input type="text" value={tags} onChange={e => setTags(e.target.value)} placeholder="e.g. Forceps, Surgical, Premium" className={fieldClass} />
         </div>
       </div>
 
@@ -184,6 +224,28 @@ export default function ProductForm({ initialData, onSuccess, onCancel }: Produc
             <input type="file" accept="image/*" disabled={uploadingImage} onChange={handleImageUpload} className="hidden" />
           </label>
         )}
+      </div>
+
+      {/* Feature Bullets */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className={labelClass + ' mb-0'}>Feature Bullets (shown on product page)</label>
+          <button type="button" onClick={() => setFeatureBullets([...featureBullets, ''])} className="flex items-center gap-1 text-xs font-bold text-accent-blue hover:text-accent-blue-hover cursor-pointer">
+            <Plus className="h-3.5 w-3.5" /> Add Bullet
+          </button>
+        </div>
+        <div className="space-y-2">
+          {featureBullets.map((bullet, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <input type="text" value={bullet} onChange={e => { const u = [...featureBullets]; u[i] = e.target.value; setFeatureBullets(u); }} placeholder="e.g. Precision Engineering" className="flex-1 h-9 rounded-xl border border-border-slate bg-slate-50 px-3.5 text-xs focus:border-accent-blue focus:bg-white focus:outline-none transition-all" />
+              {featureBullets.length > 1 && (
+                <button type="button" onClick={() => setFeatureBullets(featureBullets.filter((_, idx) => idx !== i))} className="text-slate-400 hover:text-red-500 transition-colors p-1 cursor-pointer">
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Specs */}

@@ -17,7 +17,7 @@ const MOCK_PRODUCTS = [
   { id: '4', sku: 'PD-SCALER-H6', name: 'Hygienist Scaler H6/H7', category: 'Periodontal', description: 'Double-ended sickle scaler with hollow lightweight handle.', price_pkr: 2200, price_usd: 24, image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=400' },
 ];
 
-const CATEGORIES = ['Extracting Forceps', 'Dental Pliers', 'Surgery Kits', 'Periodontal', 'Orthodontic'];
+const CATEGORIES = ['Composite Filling Tools', 'Excavators', 'Gingival Cord packers'];
 
 function CatalogContent() {
   const { market } = useMarket();

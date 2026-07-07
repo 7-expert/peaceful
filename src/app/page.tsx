@@ -544,9 +544,9 @@ export default function Home() {
                       onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                     >
                       <option>General Consultation</option>
-                      <option>Extracting Forceps MOQ Query</option>
-                      <option>Custom OEM Engraving</option>
-                      <option>Bulk Suture Kits</option>
+                      <option>Composite Filling Tools Query</option>
+                      <option>Excavators Query</option>
+                      <option>Gingival Cord packers Query</option>
                       <option>Other / General Inquiry</option>
                     </select>
                     <div className="hf-icon-wrap">
