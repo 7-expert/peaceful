@@ -27,6 +27,8 @@ function CatalogContent() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
   useEffect(() => {
     const categoryParam = searchParams.get('category');
@@ -73,15 +75,23 @@ function CatalogContent() {
     setSelectedCategory('');
     setSearchTerm('');
     setSortBy('name-asc');
+    setCurrentPage(1);
     window.history.pushState({}, '', '/products');
   };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchTerm, sortBy]);
+
+  const paginatedProducts = sorted.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(sorted.length / itemsPerPage);
 
   return (
     <div className="grid lg:grid-cols-4 gap-8">
 
       {/* Sidebar Filters */}
       <aside className="lg:col-span-1">
-        <div className="bg-white rounded-2xl border border-border-slate p-6 space-y-6">
+        <div className="bg-white border border-border-slate p-6 space-y-6 rounded-none">
           <div className="flex items-center justify-between pb-4 border-b border-slate-100">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
               <SlidersHorizontal className="h-4 w-4 text-accent-blue" /> Filter Catalog
@@ -102,7 +112,7 @@ function CatalogContent() {
                 placeholder="e.g. Forceps..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-10 rounded-xl border border-border-slate bg-slate-50 px-3.5 pr-9 text-xs focus:border-accent-blue focus:outline-none focus:bg-white transition-all"
+                className="w-full h-10 rounded-none border border-border-slate bg-slate-50 px-3.5 pr-9 text-xs focus:border-accent-blue focus:outline-none focus:bg-white transition-all"
               />
               <Search className="absolute right-3 top-3 h-4 w-4 text-slate-400" />
             </div>
@@ -114,7 +124,7 @@ function CatalogContent() {
             <div className="space-y-1">
               <button
                 onClick={() => setSelectedCategory('')}
-                className={`w-full text-left text-xs px-3.5 py-2.5 rounded-lg font-medium transition-all cursor-pointer ${!selectedCategory ? 'bg-sky-50 text-accent-blue font-bold' : 'text-slate-500 hover:bg-slate-50'
+                className={`w-full text-left text-xs px-3.5 py-2.5 rounded-none font-medium transition-all cursor-pointer ${!selectedCategory ? 'bg-sky-50 text-accent-blue font-bold' : 'text-slate-500 hover:bg-slate-50'
                   }`}
               >
                 All Instruments
@@ -123,7 +133,7 @@ function CatalogContent() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`w-full text-left text-xs px-3.5 py-2.5 rounded-lg font-medium transition-all cursor-pointer ${selectedCategory === cat ? 'bg-sky-50 text-accent-blue font-bold' : 'text-slate-500 hover:bg-slate-50'
+                  className={`w-full text-left text-xs px-3.5 py-2.5 rounded-none font-medium transition-all cursor-pointer ${selectedCategory === cat ? 'bg-sky-50 text-accent-blue font-bold' : 'text-slate-500 hover:bg-slate-50'
                     }`}
                 >
                   {cat}
@@ -138,7 +148,7 @@ function CatalogContent() {
       <div className="lg:col-span-3 space-y-6">
 
         {/* Toolbar */}
-        <div className="flex items-center justify-between bg-white rounded-2xl border border-border-slate px-6 py-4">
+        <div className="flex items-center justify-between bg-white rounded-none border border-border-slate px-6 py-4">
           <span className="text-xs text-slate-400">
             Showing <span className="font-bold text-slate-800">{sorted.length}</span> instruments
           </span>
@@ -147,7 +157,7 @@ function CatalogContent() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="text-xs border border-border-slate bg-slate-50 rounded-xl px-3 py-2 text-slate-700 font-semibold focus:border-accent-blue focus:outline-none"
+              className="text-xs border border-border-slate bg-slate-50 rounded-none px-3 py-2 text-slate-700 font-semibold focus:border-accent-blue focus:outline-none"
             >
               <option value="name-asc">Sort: A to Z</option>
               <option value="name-desc">Sort: Z to A</option>
@@ -159,34 +169,35 @@ function CatalogContent() {
 
         {loading ? (
           <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="rounded-2xl border border-border-slate bg-white animate-pulse h-80" />
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+              <div key={n} className="rounded-none border border-border-slate bg-white animate-pulse h-80" />
             ))}
           </div>
         ) : sorted.length === 0 ? (
-          <div className="py-24 text-center bg-white rounded-2xl border border-border-slate">
+          <div className="py-24 text-center bg-white rounded-none border border-border-slate">
             <p className="text-sm text-slate-400 mb-4">No dental instruments matched your criteria.</p>
             <button onClick={clearFilters} className="text-xs font-semibold text-accent-blue hover:underline cursor-pointer">
               Reset Search & Filters
             </button>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            {sorted.map((product) => (
-              <div key={product.id} className="premium-card flex flex-col overflow-hidden group">
-                <Link href={`/products/${product.slug || slugify(product.name)}`} className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative overflow-hidden hover:bg-slate-100/60 transition-colors product-card-zoom-wrapper">
-                  {product.image_url ? (
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="product-card-zoom-img"
-                    />
-                  ) : (
-                    <div className="text-xs text-slate-400">No Image Available</div>
-                  )}
-                  <span className="absolute top-3 left-3 bg-white border border-border-slate px-2.5 py-0.5 rounded-md text-[9px] font-mono text-slate-500 uppercase notranslate">
-                    {product.sku}
-                  </span>
+          <div className="space-y-8">
+            <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {paginatedProducts.map((product) => (
+                <div key={product.id} className="premium-card flex flex-col overflow-hidden group rounded-none">
+                  <Link href={`/products/${product.slug || slugify(product.name)}`} className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative overflow-hidden hover:bg-slate-100/60 transition-colors product-card-zoom-wrapper">
+                    {product.image_url ? (
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="product-card-zoom-img"
+                      />
+                    ) : (
+                      <div className="text-xs text-slate-400">No Image Available</div>
+                    )}
+                    <span className="absolute top-3 left-3 bg-white border border-border-slate px-2.5 py-0.5 rounded-none text-[9px] font-mono text-slate-500 uppercase notranslate">
+                      {product.sku}
+                    </span>
                 </Link>
                 <div className="p-5 flex flex-col flex-grow bg-white">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-accent-blue">{product.category}</span>
@@ -203,6 +214,30 @@ function CatalogContent() {
                 </div>
               </div>
             ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 pt-4">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 text-xs font-bold bg-white border border-border-slate text-slate-600 rounded-none disabled:opacity-50 hover:bg-slate-50 transition-colors"
+                >
+                  Previous
+                </button>
+                <div className="text-xs font-bold text-slate-500">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 text-xs font-bold bg-white border border-border-slate text-slate-600 rounded-none disabled:opacity-50 hover:bg-slate-50 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -565,7 +565,7 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {relatedProducts.map((rp) => (
-                  <Link key={rp.id} href={`/products/${rp.slug || slugify(rp.name)}`} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow">
+                  <Link key={rp.id} href={`/products/${rp.slug || slugify(rp.name)}`} className="group bg-white rounded-none border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative overflow-hidden product-card-zoom-wrapper">
                       {rp.image_url ? (
                         <img src={rp.image_url} alt={rp.name} className="product-card-zoom-img" />
