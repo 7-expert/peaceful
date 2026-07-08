@@ -11,10 +11,10 @@ import Link from 'next/link';
 import { slugify } from '../../lib/utils';
 
 const MOCK_PRODUCTS = [
-  { id: '1', sku: 'PD-FORCEPS-150', name: 'Cryer Extracting Forceps (150)', category: 'Extracting Forceps', description: 'Universal upper incisor and premolar forceps with anti-slip grip.', price_pkr: 4500, price_usd: 48, image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e905d?auto=format&fit=crop&q=80&w=400' },
-  { id: '2', sku: 'PD-PLIER-3PRONG', name: '3-Prong Orthodontic Plier', category: 'Dental Pliers', description: 'German carbon-alloyed steel with tungsten carbide inserts.', price_pkr: 5200, price_usd: 55, image_url: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?auto=format&fit=crop&q=80&w=400' },
-  { id: '3', sku: 'PD-KIT-SUTURE', name: 'Dental Surgery & Suture Kit (12 Pcs)', category: 'Surgery Kits', description: '12-piece complete suturing kit with leather case.', price_pkr: 14500, price_usd: 150, image_url: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&q=80&w=400' },
-  { id: '4', sku: 'PD-SCALER-H6', name: 'Hygienist Scaler H6/H7', category: 'Periodontal', description: 'Double-ended sickle scaler with hollow lightweight handle.', price_pkr: 2200, price_usd: 24, image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=400' },
+  { id: '1', sku: 'PD-FORCEPS-150', name: 'Cryer Extracting Forceps (150)', category: 'Extracting Forceps', short_description: 'Universal upper incisor and premolar forceps with anti-slip grip.', description: 'Universal upper incisor and premolar forceps with anti-slip grip. Full details...', price_pkr: 4500, price_usd: 48, image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e905d?auto=format&fit=crop&q=80&w=400' },
+  { id: '2', sku: 'PD-PLIER-3PRONG', name: '3-Prong Orthodontic Plier', category: 'Dental Pliers', short_description: 'German carbon-alloyed steel with tungsten carbide inserts.', description: 'German carbon-alloyed steel with tungsten carbide inserts. Full details...', price_pkr: 5200, price_usd: 55, image_url: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?auto=format&fit=crop&q=80&w=400' },
+  { id: '3', sku: 'PD-KIT-SUTURE', name: 'Dental Surgery & Suture Kit (12 Pcs)', category: 'Surgery Kits', short_description: '12-piece complete suturing kit with leather case.', description: '12-piece complete suturing kit with leather case. Full details...', price_pkr: 14500, price_usd: 150, image_url: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&q=80&w=400' },
+  { id: '4', sku: 'PD-SCALER-H6', name: 'Hygienist Scaler H6/H7', category: 'Periodontal', short_description: 'Double-ended sickle scaler with hollow lightweight handle.', description: 'Double-ended sickle scaler with hollow lightweight handle. Full details...', price_pkr: 2200, price_usd: 24, image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=400' },
 ];
 
 const CATEGORIES = ['Composite Filling Tools', 'Excavators', 'Gingival Cord packers'];
@@ -174,12 +174,12 @@ function CatalogContent() {
           <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {sorted.map((product) => (
               <div key={product.id} className="premium-card flex flex-col overflow-hidden group">
-                <Link href={`/products/${product.slug || slugify(product.name)}`} className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative overflow-hidden hover:bg-slate-100/60 transition-colors">
+                <Link href={`/products/${product.slug || slugify(product.name)}`} className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative overflow-hidden hover:bg-slate-100/60 transition-colors product-card-zoom-wrapper">
                   {product.image_url ? (
                     <img
                       src={product.image_url}
                       alt={product.name}
-                      className="object-contain max-h-full max-w-full group-hover:scale-105 transition-transform duration-500"
+                      className="product-card-zoom-img"
                     />
                   ) : (
                     <div className="text-xs text-slate-400">No Image Available</div>
@@ -191,7 +191,7 @@ function CatalogContent() {
                 <div className="p-5 flex flex-col flex-grow bg-white">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-accent-blue">{product.category}</span>
                   <Link href={`/products/${product.slug || slugify(product.name)}`} className="mt-1 text-sm font-bold text-primary-ocean line-clamp-1 font-display hover:text-accent-blue transition-colors notranslate">{product.name}</Link>
-                  <p className="mt-1 text-xs text-muted-slate line-clamp-2 flex-grow leading-relaxed">{product.description}</p>
+                  <p className="mt-1 text-xs text-muted-slate line-clamp-2 flex-grow leading-relaxed">{product.short_description || product.description}</p>
                   <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
                     <span className="text-base font-extrabold text-primary-ocean">
                       {market === 'pk' ? `Rs. ${product.price_pkr.toLocaleString()}` : `$${product.price_usd}`}

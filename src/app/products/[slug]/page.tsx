@@ -8,11 +8,12 @@ import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
 import { ChevronRight, ShieldCheck, Award, Loader2, Star, Check, Share2, MessageSquare } from 'lucide-react';
 import { slugify } from '../../../lib/utils';
+import ProductImageGallery from '../../../components/ProductImageGallery';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const MOCK_PRODUCTS: any[] = [
-  { id: '1', slug: 'cryer-extracting-forceps-150', sku: 'PD-FORCEPS-150', name: 'Cryer Extracting Forceps (150)', category: 'Extracting Forceps', description: 'Universal upper incisor and premolar extraction forceps with anti-slip textured handle. Manufactured from AISI 410 German stainless steel with satin-dull anti-glare finish. Precision-ground beaks ensure secure grip during extraction procedures. Ergonomic handle design reduces hand fatigue during extended surgical sessions.', price_pkr: 4500, price_usd: 48, image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e905d?auto=format&fit=crop&q=80&w=600', specifications: { Material: 'AISI 410 German Stainless Steel', Finish: 'Satin Dull (Anti-Glare)', Autoclavable: 'Yes — 134°C / 273°F', Warranty: 'Signature Guarantee', Sterilization: 'Ultrasonic + Chemical Passivation' }, stock_status: 'in_stock' },
+  { id: '1', slug: 'cryer-extracting-forceps-150', sku: 'PD-FORCEPS-150', name: 'Cryer Extracting Forceps (150)', category: 'Extracting Forceps', short_description: 'Universal upper incisor and premolar extraction forceps with anti-slip textured handle.', description: 'Universal upper incisor and premolar extraction forceps with anti-slip textured handle. Manufactured from AISI 410 German stainless steel with satin-dull anti-glare finish. Precision-ground beaks ensure secure grip during extraction procedures. Ergonomic handle design reduces hand fatigue during extended surgical sessions.', price_pkr: 4500, price_usd: 48, image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e905d?auto=format&fit=crop&q=80&w=600', specifications: { Material: 'AISI 410 German Stainless Steel', Finish: 'Satin Dull (Anti-Glare)', Autoclavable: 'Yes — 134°C / 273°F', Warranty: 'Signature Guarantee', Sterilization: 'Ultrasonic + Chemical Passivation' }, stock_status: 'in_stock' },
 ];
 
 const DEFAULT_FEATURE_BULLETS = [
@@ -206,17 +207,13 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
 
             <div className="grid lg:grid-cols-2 gap-10 items-start">
 
-              {/* Left: Product Image */}
-              <div className="bg-slate-50 rounded-2xl border-[6px] border-blue-600/30 flex items-center justify-center aspect-square p-10 relative overflow-hidden shadow-inner">
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} className="object-contain max-h-full max-w-full drop-shadow-md mix-blend-multiply" />
-                ) : (
-                  <div className="text-xs text-slate-400">No Image Available</div>
-                )}
-                <span className="absolute top-4 left-4 bg-white border border-blue-100 px-3 py-1 rounded-lg text-[10px] font-mono text-blue-700 uppercase shadow-sm notranslate">
-                  SKU: {product.sku}
-                </span>
-              </div>
+              {/* Left: Product Image Gallery */}
+              <ProductImageGallery
+                mainImage={product.image_url}
+                galleryImages={product.gallery_images}
+                productName={product.name}
+                sku={product.sku}
+              />
 
               {/* Right: Product Info */}
               <div className="space-y-5">
@@ -235,7 +232,7 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
                 </div>
                 
                 <p className="text-sm text-slate-600 leading-relaxed">
-                  {product.description}
+                  {product.short_description || product.description}
                 </p>
 
                 {/* Feature Bullets */}
@@ -566,9 +563,9 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {relatedProducts.map((rp) => (
                   <Link key={rp.id} href={`/products/${rp.slug || slugify(rp.name)}`} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative overflow-hidden">
+                    <div className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative overflow-hidden product-card-zoom-wrapper">
                       {rp.image_url ? (
-                        <img src={rp.image_url} alt={rp.name} className="object-contain max-h-full max-w-full group-hover:scale-105 transition-transform duration-500" />
+                        <img src={rp.image_url} alt={rp.name} className="product-card-zoom-img" />
                       ) : (
                         <div className="text-xs text-slate-400">No Image</div>
                       )}

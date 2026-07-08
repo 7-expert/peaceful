@@ -10,10 +10,10 @@ import Footer from '../components/Footer';
 import { Check, ShieldCheck, ArrowRight, MessageSquare, Phone } from 'lucide-react';
 
 const MOCK_PRODUCTS = [
-  { id: '1', slug: 'cryer-extracting-forceps-150', sku: 'PD-FORCEPS-150', name: 'Cryer Extracting Forceps (150)', category: 'Extracting Forceps', description: 'Universal upper incisor and premolar extraction forceps with anti-slip textured handle.', price_pkr: 4500, price_usd: 48, image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e905d?auto=format&fit=crop&q=80&w=400' },
-  { id: '2', slug: '3-prong-orthodontic-plier', sku: 'PD-PLIER-3PRONG', name: '3-Prong Orthodontic Plier', category: 'Dental Pliers', description: 'German carbon-alloyed steel plier with tungsten carbide inserts for wire bending.', price_pkr: 5200, price_usd: 55, image_url: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?auto=format&fit=crop&q=80&w=400' },
-  { id: '3', slug: 'dental-surgery-suture-kit', sku: 'PD-KIT-SUTURE', name: 'Dental Surgery & Suture Kit', category: 'Surgery Kits', description: '12-piece complete suturing kit with needle holders, scissors, and leather case.', price_pkr: 14500, price_usd: 150, image_url: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&q=80&w=400' },
-  { id: '4', slug: 'hygienist-scaler-h6h7', sku: 'PD-SCALER-H6', name: 'Hygienist Scaler H6/H7', category: 'Periodontal', description: 'Double-ended sickle scaler with hollow lightweight handle for plaque removal.', price_pkr: 2200, price_usd: 24, image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=400' },
+  { id: '1', slug: 'cryer-extracting-forceps-150', sku: 'PD-FORCEPS-150', name: 'Cryer Extracting Forceps (150)', category: 'Extracting Forceps', short_description: 'Universal upper incisor and premolar extraction forceps with anti-slip textured handle.', description: 'Universal upper incisor and premolar extraction forceps with anti-slip textured handle. Detailed description...', price_pkr: 4500, price_usd: 48, image_url: 'https://images.unsplash.com/photo-1579684389782-64d84b5e905d?auto=format&fit=crop&q=80&w=400' },
+  { id: '2', slug: '3-prong-orthodontic-plier', sku: 'PD-PLIER-3PRONG', name: '3-Prong Orthodontic Plier', category: 'Dental Pliers', short_description: 'German carbon-alloyed steel plier with tungsten carbide inserts for wire bending.', description: 'German carbon-alloyed steel plier with tungsten carbide inserts for wire bending. Detailed description...', price_pkr: 5200, price_usd: 55, image_url: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?auto=format&fit=crop&q=80&w=400' },
+  { id: '3', slug: 'dental-surgery-suture-kit', sku: 'PD-KIT-SUTURE', name: 'Dental Surgery & Suture Kit', category: 'Surgery Kits', short_description: '12-piece complete suturing kit with needle holders, scissors, and leather case.', description: '12-piece complete suturing kit with needle holders, scissors, and leather case. Detailed description...', price_pkr: 14500, price_usd: 150, image_url: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&q=80&w=400' },
+  { id: '4', slug: 'hygienist-scaler-h6h7', sku: 'PD-SCALER-H6', name: 'Hygienist Scaler H6/H7', category: 'Periodontal', short_description: 'Double-ended sickle scaler with hollow lightweight handle for plaque removal.', description: 'Double-ended sickle scaler with hollow lightweight handle for plaque removal. Detailed description...', price_pkr: 2200, price_usd: 24, image_url: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=400' },
 ];
 
 export default function Home() {
@@ -334,9 +334,9 @@ export default function Home() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredProducts.map((product) => (
                 <Link key={product.id} href={`/products/${product.slug || slugify(product.name)}`} className="premium-card flex flex-col overflow-hidden group bg-white">
-                  <div className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative overflow-hidden">
+                  <div className="aspect-square bg-slate-50 flex items-center justify-center p-8 relative overflow-hidden product-card-zoom-wrapper">
                     {product.image_url ? (
-                      <img src={product.image_url} alt={product.name} className="object-contain max-h-full max-w-full group-hover:scale-105 transition-transform duration-500" />
+                      <img src={product.image_url} alt={product.name} className="product-card-zoom-img" />
                     ) : (
                       <div className="text-xs text-slate-400">No Image</div>
                     )}
@@ -345,7 +345,7 @@ export default function Home() {
                   <div className="p-5 flex flex-col flex-grow bg-white border-t border-slate-100">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">{product.category}</span>
                     <h3 className="mt-1 text-sm font-bold text-slate-900 line-clamp-1 font-display notranslate">{product.name}</h3>
-                    <p className="mt-1 text-xs text-slate-500 line-clamp-2 flex-grow leading-relaxed">{product.description}</p>
+                    <p className="mt-1 text-xs text-slate-500 line-clamp-2 flex-grow leading-relaxed">{product.short_description || product.description}</p>
                     <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
                       <span className="text-base font-extrabold text-blue-600">
                         {market === 'pk' ? `Rs. ${product.price_pkr.toLocaleString()}` : `$${product.price_usd}`}

@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabase';
-import ProductForm from '../../../components/admin/ProductForm';
 import { Plus, Edit3, Trash2, LogOut, Search, Loader2, Package, Star, AlertCircle, ArrowLeft, ClipboardList, MailOpen, Check, X } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -20,8 +19,6 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<any>(null);
 
   // Inquiries state
   const [inquiries, setInquiries] = useState<any[]>([]);
@@ -237,12 +234,12 @@ export default function AdminDashboard() {
                 />
                 <Search className="absolute left-3.5 h-4 w-4 text-slate-400" />
               </div>
-              <button
-                onClick={() => { setEditingProduct(null); setIsFormOpen(true); }}
+              <Link
+                href="/admin/products/new"
                 className="flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl bg-primary-ocean text-white text-xs font-semibold hover:bg-primary-ocean-hover transition-colors shadow-xs cursor-pointer"
               >
                 <Plus className="h-4 w-4" /> Add Instrument
-              </button>
+              </Link>
             </div>
 
             {/* Table */}
@@ -296,13 +293,13 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
-                            <button
-                              onClick={() => { setEditingProduct(p); setIsFormOpen(true); }}
+                            <Link
+                              href={`/admin/products/${p.id}`}
                               className="h-8 w-8 flex items-center justify-center rounded-xl border border-border-slate text-slate-400 hover:text-accent-blue hover:border-accent-blue/30 hover:bg-white transition-all cursor-pointer shadow-xs"
                               title="Edit details"
                             >
                               <Edit3 className="h-4 w-4" />
-                            </button>
+                            </Link>
                             <button
                               onClick={() => handleDelete(p.id, p.name)}
                               className="h-8 w-8 flex items-center justify-center rounded-xl border border-border-slate text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-white transition-all cursor-pointer shadow-xs"
@@ -530,29 +527,6 @@ export default function AdminDashboard() {
         )}
 
       </main>
-
-      {/* Modal dialog wrapper */}
-      {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="w-full max-w-2xl bg-white rounded-3xl border border-border-slate shadow-2xl overflow-hidden mt-10">
-            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
-              <h2 className="text-base font-bold text-primary-ocean font-display">
-                {editingProduct ? 'Update Instrument Parameters' : 'Add New Instrument'}
-              </h2>
-              <button onClick={() => setIsFormOpen(false)} className="text-slate-300 hover:text-slate-600 transition-colors cursor-pointer">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="p-6">
-              <ProductForm
-                initialData={editingProduct}
-                onSuccess={() => { setIsFormOpen(false); setEditingProduct(null); fetchProducts(); }}
-                onCancel={() => { setIsFormOpen(false); setEditingProduct(null); }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
