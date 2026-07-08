@@ -221,6 +221,9 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display leading-tight notranslate">
                     {product.name}
                   </h1>
+                  <div className="mt-2 text-xl font-bold text-blue-600">
+                    ${product.price_usd}
+                  </div>
                 </div>
 
                 {/* Star Rating */}
@@ -575,7 +578,7 @@ export default function ProductDetail({ params }: { params: Promise<{ slug: stri
                       <h3 className="mt-1 text-sm font-bold text-slate-900 line-clamp-1 font-display notranslate">{rp.name}</h3>
                       <div className="mt-3 flex items-center justify-between">
                         <span className="text-base font-extrabold text-blue-600">
-                          {market === 'pk' ? `Rs. ${rp.price_pkr?.toLocaleString()}` : `$${rp.price_usd}`}
+                          ${rp.price_usd}
                         </span>
                         <span className="text-xs font-bold text-blue-600 group-hover:underline">Get Quote &rarr;</span>
                       </div>

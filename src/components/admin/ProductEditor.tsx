@@ -337,7 +337,7 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
                 </div>
                 <div>
                   <label className={labelClass}>Regular Price (USD) *</label>
-                  <input type="number" required min="0" step="0.01" value={priceUsd} onChange={e => setPriceUsd(e.target.value)} className={fieldClass} />
+                  <input type="text" required value={priceUsd} onChange={e => setPriceUsd(e.target.value)} className={fieldClass} placeholder="e.g. 48.50" />
                 </div>
                 <div>
                   <label className={labelClass}>Stock Status</label>

@@ -63,7 +63,7 @@ function CatalogContent() {
   const sorted = [...products].sort((a, b) => {
     if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
     if (sortBy === 'name-desc') return b.name.localeCompare(a.name);
-    const k = market === 'pk' ? 'price_pkr' : 'price_usd';
+    const k = 'price_usd';
     if (sortBy === 'price-asc') return a[k] - b[k];
     if (sortBy === 'price-desc') return b[k] - a[k];
     return 0;
@@ -194,7 +194,7 @@ function CatalogContent() {
                   <p className="mt-1 text-xs text-muted-slate line-clamp-2 flex-grow leading-relaxed">{product.short_description || product.description}</p>
                   <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
                     <span className="text-base font-extrabold text-primary-ocean">
-                      {market === 'pk' ? `Rs. ${product.price_pkr.toLocaleString()}` : `$${product.price_usd}`}
+                      ${product.price_usd}
                     </span>
                     <Link href={`/products/${product.slug || slugify(product.name)}`} className="text-xs font-bold text-accent-blue hover:underline">
                       Get Quote →
