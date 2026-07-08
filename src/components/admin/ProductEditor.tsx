@@ -12,6 +12,23 @@ interface ProductEditorProps {
 
 const CATEGORIES = ['Composite Filling Tools', 'Excavators', 'Gingival Cord packers'];
 
+// Panel component defined OUTSIDE ProductEditor to prevent remounting on every render
+function Panel({ title, isOpen, onToggle, children }: { title: string; isOpen: boolean; onToggle: () => void; children: React.ReactNode }) {
+  return (
+    <div className="bg-white border border-slate-300 rounded-sm mb-4">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-50 border-b border-slate-200 text-sm font-bold text-slate-800 hover:bg-slate-100 transition-colors"
+      >
+        <span>{title}</span>
+        {isOpen ? <ChevronUp className="h-4 w-4 text-slate-500" /> : <ChevronDown className="h-4 w-4 text-slate-500" />}
+      </button>
+      {isOpen && <div className="p-3.5 space-y-4">{children}</div>}
+    </div>
+  );
+}
+
 const DEFAULT_BULLETS = [
   'Precision Engineering',
   'Ergonomic Design',
@@ -26,7 +43,7 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
   
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
-  const [category, setCategory] = useState('Composite Filling Tools');
+  const [categories, setCategories] = useState<string[]>(['Composite Filling Tools']);
   const [productType, setProductType] = useState('');
   const [size, setSize] = useState('');
   const [tags, setTags] = useState('');
@@ -64,7 +81,9 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
     if (!initialData) return;
     setName(initialData.name || '');
     setSku(initialData.sku || '');
-    setCategory(initialData.category || 'Composite Filling Tools');
+    if (initialData.category) {
+      setCategories(Array.isArray(initialData.category) ? initialData.category : [initialData.category]);
+    }
     setProductType(initialData.product_type || '');
     setSize(initialData.size || '');
     setTags(initialData.tags ? initialData.tags.join(', ') : '');
@@ -146,7 +165,7 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
     });
     const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
     const payload = {
-      sku: sku.trim(), name: name.trim(), category, description: description.trim(),
+      sku: sku.trim(), name: name.trim(), category: categories.join(', '), description: description.trim(),
       short_description: shortDescription.trim(),
       product_type: productType.trim(),
       size: size.trim(),
@@ -178,20 +197,11 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
   const fieldClass = "w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-accent-blue focus:ring-1 focus:ring-accent-blue focus:outline-none transition-all";
   const labelClass = "block text-sm font-semibold text-slate-700 mb-1";
 
-  // Reusable panel component for the sidebar
-  const Panel = ({ title, id, children }: { title: string, id: keyof typeof panels, children: React.ReactNode }) => (
-    <div className="bg-white border border-slate-300 rounded-sm mb-4">
-      <button 
-        type="button"
-        onClick={() => togglePanel(id)} 
-        className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-50 border-b border-slate-200 text-sm font-bold text-slate-800 hover:bg-slate-100 transition-colors"
-      >
-        <span>{title}</span>
-        {panels[id] ? <ChevronUp className="h-4 w-4 text-slate-500" /> : <ChevronDown className="h-4 w-4 text-slate-500" />}
-      </button>
-      {panels[id] && <div className="p-3.5 space-y-4">{children}</div>}
-    </div>
-  );
+  const toggleCategory = (cat: string) => {
+    setCategories(prev =>
+      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+    );
+  };
 
   return (
     <div className="min-h-screen bg-slate-100 pb-12">
@@ -279,8 +289,8 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
               <div className="p-4 space-y-3">
                 {specs.map((s, i) => (
                   <div key={i} className="flex gap-3 items-center">
-                    <input type="text" value={s.key} onChange={e => { const u = [...specs]; u[i].key = e.target.value; setSpecs(u); }} placeholder="Property (e.g. Material)" className={`${fieldClass} w-1/3`} />
-                    <input type="text" value={s.value} onChange={e => { const u = [...specs]; u[i].value = e.target.value; setSpecs(u); }} placeholder="Value (e.g. Stainless Steel)" className={`${fieldClass} flex-1`} />
+                    <input type="text" value={s.key} onChange={e => setSpecs(specs.map((spec, idx) => idx === i ? { ...spec, key: e.target.value } : spec))} placeholder="Property (e.g. Material)" className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-accent-blue focus:ring-1 focus:ring-accent-blue focus:outline-none transition-all" style={{ width: '35%', flexShrink: 0 }} />
+                    <input type="text" value={s.value} onChange={e => setSpecs(specs.map((spec, idx) => idx === i ? { ...spec, value: e.target.value } : spec))} placeholder="Value (e.g. Stainless Steel)" className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-accent-blue focus:ring-1 focus:ring-accent-blue focus:outline-none transition-all min-w-0" />
                     {specs.length > 1 && (
                       <button type="button" onClick={() => setSpecs(specs.filter((_, idx) => idx !== i))} className="text-red-500 hover:text-red-700 p-1">
                         <Trash2 className="h-4 w-4" />
@@ -312,7 +322,7 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
           <div className="w-full lg:w-80 flex-shrink-0 space-y-4">
             
             {/* Publish Panel */}
-            <Panel title="Publish" id="publish">
+            <Panel title="Publish" isOpen={panels.publish} onToggle={() => togglePanel('publish')}>
               <div className="flex items-center justify-between mb-4 text-sm text-slate-600">
                 <span>Status:</span>
                 <span className="font-semibold text-slate-800">Published</span>
@@ -329,7 +339,7 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
             </Panel>
 
             {/* Product Data Panel */}
-            <Panel title="Product Data" id="data">
+            <Panel title="Product Data" isOpen={panels.data} onToggle={() => togglePanel('data')}>
               <div className="space-y-4">
                 <div>
                   <label className={labelClass}>SKU *</label>
@@ -367,16 +377,15 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
             </Panel>
 
             {/* Categories Panel */}
-            <Panel title="Product Categories" id="categories">
+            <Panel title="Product Categories" isOpen={panels.categories} onToggle={() => togglePanel('categories')}>
               <div className="max-h-48 overflow-y-auto pr-2 space-y-2">
                 {CATEGORIES.map(cat => (
                   <label key={cat} className="flex items-center gap-2 cursor-pointer">
                     <input 
-                      type="radio" 
-                      name="category"
-                      checked={category === cat}
-                      onChange={() => setCategory(cat)}
-                      className="text-accent-blue focus:ring-accent-blue" 
+                      type="checkbox" 
+                      checked={categories.includes(cat)}
+                      onChange={() => toggleCategory(cat)}
+                      className="rounded text-accent-blue focus:ring-accent-blue" 
                     />
                     <span className="text-sm text-slate-700">{cat}</span>
                   </label>
@@ -385,7 +394,7 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
             </Panel>
 
             {/* Product Image Panel */}
-            <Panel title="Product Image" id="image">
+            <Panel title="Product Image" isOpen={panels.image} onToggle={() => togglePanel('image')}>
               {imageUrl ? (
                 <div className="space-y-3">
                   <div className="relative group rounded bg-slate-50 border border-slate-200 overflow-hidden">
@@ -406,7 +415,7 @@ export default function ProductEditor({ initialData }: ProductEditorProps) {
             </Panel>
 
             {/* Product Gallery Panel */}
-            <Panel title="Product Gallery" id="gallery">
+            <Panel title="Product Gallery" isOpen={panels.gallery} onToggle={() => togglePanel('gallery')}>
               <div className="space-y-3">
                 {galleryImages.length > 0 && (
                   <div className="grid grid-cols-4 gap-2">
