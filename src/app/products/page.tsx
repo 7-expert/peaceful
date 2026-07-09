@@ -83,9 +83,13 @@ function CatalogContent() {
     setCurrentPage(1);
   }, [selectedCategory, searchTerm, sortBy]);
 
+  const isMounted = useRef(false);
+
   useEffect(() => {
-    if (currentPage > 1) {
+    if (isMounted.current) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      isMounted.current = true;
     }
   }, [currentPage]);
 

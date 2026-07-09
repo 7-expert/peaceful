@@ -148,10 +148,7 @@ export default function Footer() {
       <div className="ft-bottom max-w-6xl mx-auto px-6 py-6 flex items-center justify-between flex-wrap gap-4 border-t border-slate-100 text-xs text-slate-400 relative z-10">
         <p className="ft-copy">© {new Date().getFullYear()} Peaceful Dental Solutions. All Rights Reserved.</p>
         <div className="ft-cards flex gap-2">
-          <span className="ft-card visa bg-slate-50 border border-slate-200 text-blue-600 px-2 py-0.5 rounded">VISA</span>
-          <span className="ft-card amex bg-slate-50 border border-slate-200 text-sky-600 px-2 py-0.5 rounded">AMEX</span>
-          <span className="ft-card discover bg-slate-50 border border-slate-200 text-amber-600 px-2 py-0.5 rounded">DISC</span>
-          <span className="ft-card mc bg-slate-50 border border-slate-200 text-red-500 px-2 py-0.5 rounded">MC</span>
+          <Image src="/cards.png" alt="Payment Methods" width={200} height={30} className="h-[35px] w-auto object-contain" />
         </div>
       </div>
     </footer>
