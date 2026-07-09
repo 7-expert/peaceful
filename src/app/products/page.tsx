@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useMarket } from '../../context/MarketContext';
 import { supabase } from '../../lib/supabase';
@@ -82,6 +82,12 @@ function CatalogContent() {
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, searchTerm, sortBy]);
+
+  useEffect(() => {
+    if (currentPage > 1) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentPage]);
 
   const paginatedProducts = sorted.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const totalPages = Math.ceil(sorted.length / itemsPerPage);
